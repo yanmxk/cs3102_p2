@@ -30,22 +30,18 @@
 #define LRTP_TYPE_data      ((uint8_t) 0x40)
 #define LRTP_TYPE_data_req  (LRTP_TYPE_data | LRTP_TYPE_req)
 #define LRTP_TYPE_data_ack  (LRTP_TYPE_data | LRTP_TYPE_ack)
-
-
 typedef struct Lrtp_Header_s {
-
-  /* This header should not have a memory image greater than 100 bytes */
-
-  /* CS3102 : define your header here */
-
-} Lrtp_Header_t;
-
-#define LRTP_MAX_PAYLOAD_SIZE LRTP_MAX_DATA_SIZE
+    uint8_t  type;
+    uint8_t  _pad;
+    uint16_t _pad2;
+    uint32_t seq;
+    uint16_t data_size;
+    uint16_t _pad3;
+} Lrtp_Header_t;  /* 12 bytes */
 
 typedef struct Lrtp_Packet_s {
-
-  /* CS3102 : define your packet here */
-
+    Lrtp_Header_t hdr;
+    uint8_t       payload[LRTP_MAX_DATA_SIZE];
 } Lrtp_Packet_t;
 
 

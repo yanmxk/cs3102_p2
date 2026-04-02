@@ -22,7 +22,23 @@ H-files	= lrtp.h lrtp-common.h lrtp-pcb.h byteorder64.h d_print.h
 
 LIB-files	=lrtp.o lrtp-common.o lrtp-pcb.o lrtp-fsm.o byteorder64.o d_print.o
 
-all:	$(PROGRAMS) liblrtp.a
+all: $(PROGRAMS) liblrtp.a
+
+# Build drop utility in parent directory
+drop: ../drop.c
+	$(CC) -o ../drop ../drop.c
+
+# Run drop utility with arguments: make run-drop d=10 p=1000
+.PHONY: run-drop
+run-drop: drop
+	@echo "Usage: make run-drop d=<drop%> p=<packets>"
+	@if [ -z "$$d" ] || [ -z "$$p" ]; then \
+		echo "Please provide d and p, e.g. make run-drop d=10 p=1000"; \
+		exit 1; \
+	 else \
+		../drop $$d $$p; \
+	 fi
+
 
 liblrtp.a: $(LIB-files)
 	ar ruv $@ $+
@@ -78,6 +94,7 @@ test-server-3: test-server-3.o liblrtp.a
 
 test-server-3.c: $(H-files)
 
-.PHONY:	clean
+.PHONY: clean
 
-clean:;		rm -rf *.o *.a $(PROGRAMS) *~
+clean:
+	rm -rf *.o *.a $(PROGRAMS) *~ ../drop

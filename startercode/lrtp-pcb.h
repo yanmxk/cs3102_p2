@@ -32,6 +32,11 @@ typedef struct Lrtp_Pcb_s { /* protocol control block - only one connection */
   uint32_t rtt; /* most recent rtt [us], assume < ~4x10^9us (i.e. < ~400s) */
   uint32_t rto; /* current retransmission timeout value [us] */
 
+  /* Adaptive RTO fields (based on RTT measurements) */
+  uint32_t srtt; /* smoothed RTT [us] */
+  uint32_t rttvar; /* RTT variance [us] */
+  uint64_t tx_timestamp; /* timestamp when last packet was sent [us] */
+
   /*
     The following uint64_t counters are for convenience only, and are not
     needed for the operation of the protocol.

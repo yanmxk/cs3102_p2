@@ -1,6 +1,8 @@
 #ifndef __lrtp_fsm_h__
 #define __lrtp_fsm_h__
 
+#include <inttypes.h>
+
 /*
   CS3102 Coursework P2 : Lightweight Reliable Transport Protocol (LRTP)
 
@@ -23,5 +25,8 @@ typedef enum LRTP_state_e {
 } LRTP_state_t;
 
 /* CS3102: add anything else here if needed */
+
+/* Adaptive RTO calculation based on RTT measurements (like TCP) */
+uint32_t lrtp_calculate_adaptive_rto(uint32_t rtt, uint32_t *srtt, uint32_t *rttvar);
 
 #endif /* __lrtp_fsm_h__ */

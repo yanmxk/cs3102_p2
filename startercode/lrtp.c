@@ -155,6 +155,12 @@ int lrtp_accept(int sd)
     memset(&pkt, 0, sizeof(pkt));
     remote_len = sizeof(G_pcb.remote);
 
+    /* Record timestamp for first open_reqack sent (for RTT measurement) */
+    if (retries == 0 && G_pcb.tx_timestamp == 0)
+    {
+      G_pcb.tx_timestamp = lrtp_timestamp();
+    }
+
     n = recvfrom(sd, (void *)&pkt, sizeof(pkt), 0,
                  (struct sockaddr *)&G_pcb.remote, &remote_len);
 
@@ -182,6 +188,16 @@ int lrtp_accept(int sd)
       G_pcb.open_ack_rx++;
       G_pcb.seq_tx++; /* Increment for data phase */
       G_pcb.state = LRTP_state_connected;
+      
+      /* Calculate RTT and update adaptive RTO on first successful reception */
+      if (G_pcb.tx_timestamp > 0)
+      {
+        uint64_t now = lrtp_timestamp();
+        uint32_t rtt = (uint32_t)(now - G_pcb.tx_timestamp);
+        G_pcb.rtt = rtt;
+        G_pcb.rto = lrtp_calculate_adaptive_rto(rtt, &G_pcb.srtt, &G_pcb.rttvar);
+      }
+      
       return sd;
     }
     else if (pkt.hdr.type == LRTP_TYPE_open_req)
@@ -265,7 +281,7 @@ int lrtp_open(const char *fqdn, uint16_t port)
   G_pcb.start_time = lrtp_timestamp();
 
   /* 3-way handshake */
-  set_recv_timeout(sd, LRTP_RTO_FIXED);
+  set_recv_timeout(sd, G_pcb.rto);
   Lrtp_Packet_t pkt;
   int retries = 0;
 
@@ -275,6 +291,12 @@ int lrtp_open(const char *fqdn, uint16_t port)
     pkt.hdr.type = LRTP_TYPE_open_req;
     pkt.hdr.seq = G_pcb.seq_tx;
     pkt.hdr.data_size = 0;
+
+    /* Record send timestamp for RTT measurement */
+    if (retries == 0)
+    {
+      G_pcb.tx_timestamp = lrtp_timestamp();
+    }
 
     if (sendto(sd, (void *)&pkt, sizeof(pkt.hdr), 0,
                (struct sockaddr *)&remote, sizeof(remote)) < 0)
@@ -296,10 +318,22 @@ int lrtp_open(const char *fqdn, uint16_t port)
     {
       G_pcb.open_reqack_rx++;
       G_pcb.seq_rx = pkt.hdr.seq + 1;
+      
+      /* Calculate RTT and update adaptive RTO on first successful reception */
+      if (retries == 0)
+      {
+        uint64_t now = lrtp_timestamp();
+        uint32_t rtt = (uint32_t)(now - G_pcb.tx_timestamp);
+        G_pcb.rtt = rtt;
+        G_pcb.rto = lrtp_calculate_adaptive_rto(rtt, &G_pcb.srtt, &G_pcb.rttvar);
+      }
+      
       break;
     }
 
     retries++;
+    /* Update timeout for retransmissions */
+    set_recv_timeout(sd, G_pcb.rto);
   }
 
   if (retries > LRTP_MAX_RE_TX)
@@ -342,7 +376,7 @@ int lrtp_close(int sd)
     return LRTP_ERROR_fsm;
   }
 
-  set_recv_timeout(sd, LRTP_RTO_FIXED);
+  set_recv_timeout(sd, G_pcb.rto);
 
   Lrtp_Packet_t pkt;
   int retries = 0;
@@ -400,7 +434,7 @@ int lrtp_tx(int sd, void *data, uint16_t data_size)
     return LRTP_ERROR_fsm;
   }
 
-  set_recv_timeout(sd, LRTP_RTO_FIXED);
+  set_recv_timeout(sd, G_pcb.rto);
 
   Lrtp_Packet_t pkt;
   int retries = 0;
@@ -412,6 +446,12 @@ int lrtp_tx(int sd, void *data, uint16_t data_size)
     pkt.hdr.seq = G_pcb.seq_tx++;
     pkt.hdr.data_size = data_size;
     memcpy(pkt.payload, data, data_size);
+
+    /* Record send timestamp for RTT measurement */
+    if (retries == 0)
+    {
+      G_pcb.tx_timestamp = lrtp_timestamp();
+    }
 
     if (sendto(sd, (void *)&pkt, sizeof(pkt.hdr) + data_size, 0,
                (struct sockaddr *)&G_pcb.remote, sizeof(G_pcb.remote)) < 0)
@@ -436,10 +476,22 @@ int lrtp_tx(int sd, void *data, uint16_t data_size)
     if (n > 0 && pkt.hdr.type == LRTP_TYPE_data_ack && pkt.hdr.seq == G_pcb.seq_tx - 1)
     {
       G_pcb.data_ack_rx++;
+      
+      /* Calculate RTT and update adaptive RTO */
+      if (retries == 0)
+      {
+        uint64_t now = lrtp_timestamp();
+        uint32_t rtt = (uint32_t)(now - G_pcb.tx_timestamp);
+        G_pcb.rtt = rtt;
+        G_pcb.rto = lrtp_calculate_adaptive_rto(rtt, &G_pcb.srtt, &G_pcb.rttvar);
+      }
+      
       return data_size;
     }
 
     retries++;
+    /* Update timeout for retransmissions */
+    set_recv_timeout(sd, G_pcb.rto);
   }
 
   return LRTP_ERROR;

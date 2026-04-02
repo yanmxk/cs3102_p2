@@ -55,6 +55,11 @@ reset_LrtpPcb()
   G_pcb.re_tx = 0;
   G_pcb.rtt = 0;
   G_pcb.rto = LRTP_RTO_FIXED; /* use this to start with */
+  
+  /* Adaptive RTO initialization */
+  G_pcb.srtt = 0; /* smoothed RTT, 0 means not yet measured */
+  G_pcb.rttvar = 0; /* RTT variance */
+  G_pcb.tx_timestamp = 0; /* timestamp of sent packet */
 
 #define RESETu64(r64_)  G_pcb.r64_ = 0
 

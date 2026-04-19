@@ -143,145 +143,64 @@ tests/test-stress-server.c: $(H-files)
 
 .PHONY: run_test_adaptive
 
-# Detect a terminal emulator on Linux. User can override by setting TERMINAL env var.
-TERMINAL := $(shell for t in gnome-terminal xterm konsole lxterminal mate-terminal; do command -v $$t >/dev/null 2>&1 && { echo $$t; exit 0; }; done)
+# Use tmux to run server/client in split panes inside a single terminal.
+# This works inside VS Code integrated terminal as a single split terminal pane.
+# Requires `tmux` to be installed. User can override TMUX_SESSION.
+TMUX := $(shell command -v tmux 2>/dev/null)
+TMUX_SESSION ?= lrtp_test_$(shell basename "$(CURDIR)")
 
-run_test_adaptive: test-adaptive-rto-server test-adaptive-rto-client
-	@echo "Launching adaptive RTO server and client in new terminal windows..."
-	@TER="$(TERMINAL)"; \
-	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
-	CMD='cd "$(CURDIR)"; ./test-adaptive-rto-server 24536; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
-	else $$TER -e bash -lc "$$CMD"; fi; \
-	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-adaptive-rto-client localhost 24536 10; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
-	else $$TER -e bash -lc "$$CMD2"; fi
+define LAUNCH_TMUX_PAIR
+	if [ -z "$(TMUX)" ]; then echo "tmux not found. Install tmux or set TERMINAL to use external terminals."; exit 1; fi; \
+	# Kill any existing session with same name to start fresh
+	if $(TMUX) has-session -t $(TMUX_SESSION) 2>/dev/null; then $(TMUX) kill-session -t $(TMUX_SESSION); fi; \
+	# Create new session with server in left pane
+	$(TMUX) new-session -d -s $(TMUX_SESSION) 'cd "$(CURDIR)"; $(1)'; \
+	# split horizontally and run client in right pane
+	$(TMUX) split-window -h -t $(TMUX_SESSION) 'cd "$(CURDIR)"; $(2)'; \
+	# select left pane and attach (user sees split panes)
+	$(TMUX) select-pane -L -t $(TMUX_SESSION); \
+	$(TMUX) attach-session -t $(TMUX_SESSION)
+endef
 
-# Convenience targets to launch each test pair in new terminal windows (Linux)
-.PHONY: run_test_0 run_test_1 run_test_2 run_test_3 \
+.PHONY: run_test_adaptive run_test_0 run_test_1 run_test_2 run_test_3 \
         run_test_large_transfer run_test_multiple_sends run_test_stress run_all_tests
 
+run_test_adaptive: test-adaptive-rto-server test-adaptive-rto-client
+	@echo "Launching adaptive RTO server and client in tmux split panes (session=$(TMUX_SESSION))..."
+	@$(call LAUNCH_TMUX_PAIR,./test-adaptive-rto-server\ 24536,./test-adaptive-rto-client\ localhost\ 24536\ 10)
+
 run_test_0: test-server-0 test-client-0
-	@echo "Launching test-client-0/test-server-0..."
-	@TER="$(TERMINAL)"; \
-	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
-	CMD='cd "$(CURDIR)"; ./test-server-0; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
-	else $$TER -e bash -lc "$$CMD"; fi; \
-	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-client-0 localhost; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
-	else $$TER -e bash -lc "$$CMD2"; fi
+	@echo "Launching test 0 (server/client) in tmux session=$(TMUX_SESSION)..."
+	@$(call LAUNCH_TMUX_PAIR,./test-server-0,./test-client-0\ localhost)
 
 run_test_1: test-server-1 test-client-1
-	@echo "Launching test-client-1/test-server-1..."
-	@TER="$(TERMINAL)"; \
-	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
-	CMD='cd "$(CURDIR)"; ./test-server-1; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
-	else $$TER -e bash -lc "$$CMD"; fi; \
-	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-client-1 localhost; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
-	else $$TER -e bash -lc "$$CMD2"; fi
+	@echo "Launching test 1 (server/client) in tmux session=$(TMUX_SESSION)..."
+	@$(call LAUNCH_TMUX_PAIR,./test-server-1,./test-client-1\ localhost)
 
 run_test_2: test-server-2 test-client-2
-	@echo "Launching test-client-2/test-server-2..."
-	@TER="$(TERMINAL)"; \
-	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
-	CMD='cd "$(CURDIR)"; ./test-server-2; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
-	else $$TER -e bash -lc "$$CMD"; fi; \
-	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-client-2 localhost; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
-	else $$TER -e bash -lc "$$CMD2"; fi
+	@echo "Launching test 2 (server/client) in tmux session=$(TMUX_SESSION)..."
+	@$(call LAUNCH_TMUX_PAIR,./test-server-2,./test-client-2\ localhost)
 
 run_test_3: test-server-3 test-client-3
-	@echo "Launching test-client-3/test-server-3..."
-	@TER="$(TERMINAL)"; \
-	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
-	CMD='cd "$(CURDIR)"; ./test-server-3; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
-	else $$TER -e bash -lc "$$CMD"; fi; \
-	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-client-3 localhost; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
-	else $$TER -e bash -lc "$$CMD2"; fi
+	@echo "Launching test 3 (server/client) in tmux session=$(TMUX_SESSION)..."
+	@$(call LAUNCH_TMUX_PAIR,./test-server-3,./test-client-3\ localhost)
 
 run_test_large_transfer: test-large-transfer-server test-large-transfer-client
-	@echo "Launching large-transfer server and client..."
-	@TER="$(TERMINAL)"; \
-	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
-	CMD='cd "$(CURDIR)"; ./test-large-transfer-server 24536; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
-	else $$TER -e bash -lc "$$CMD"; fi; \
-	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-large-transfer-client localhost 24536; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
-	else $$TER -e bash -lc "$$CMD2"; fi
+	@echo "Launching large-transfer server and client in tmux session=$(TMUX_SESSION)..."
+	@$(call LAUNCH_TMUX_PAIR,./test-large-transfer-server\ 24536,./test-large-transfer-client\ localhost\ 24536)
 
 run_test_multiple_sends: test-multiple-sends-server test-multiple-sends-client
-	@echo "Launching multiple-sends server and client..."
-	@TER="$(TERMINAL)"; \
-	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
-	CMD='cd "$(CURDIR)"; ./test-multiple-sends-server 24536; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
-	else $$TER -e bash -lc "$$CMD"; fi; \
-	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-multiple-sends-client localhost 24536; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
-	else $$TER -e bash -lc "$$CMD2"; fi
+	@echo "Launching multiple-sends server and client in tmux session=$(TMUX_SESSION)..."
+	@$(call LAUNCH_TMUX_PAIR,./test-multiple-sends-server\ 24536,./test-multiple-sends-client\ localhost\ 24536)
 
 run_test_stress: test-stress-server test-stress-client
-	@echo "Launching stress server and client..."
-	@TER="$(TERMINAL)"; \
-	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
-	CMD='cd "$(CURDIR)"; ./test-stress-server 24536; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
-	else $$TER -e bash -lc "$$CMD"; fi; \
-	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-stress-client localhost 24536; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
-	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
-	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
-	else $$TER -e bash -lc "$$CMD2"; fi
+	@echo "Launching stress server and client in tmux session=$(TMUX_SESSION)..."
+	@$(call LAUNCH_TMUX_PAIR,./test-stress-server\ 24536,./test-stress-client\ localhost\ 24536)
 
-# Run all tests (will open many terminal windows)
+# Run all tests sequentially (each will attach to tmux; user can detach and re-run)
 run_all_tests: run_test_0 run_test_1 run_test_2 run_test_3 run_test_adaptive \
                run_test_large_transfer run_test_multiple_sends run_test_stress
-	@echo "Launched all test pairs (check terminal windows)."
+	@echo "Launched all test pairs (tmux sessions)."
 
 .PHONY: clean
 

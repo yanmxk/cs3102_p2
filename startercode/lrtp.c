@@ -1,5 +1,5 @@
 /*
-  CS3201 Coursework P2 : Lightweight Reliable Transport Protocol (LRTP).
+  CS3102 Coursework P2 : Lightweight Reliable Transport Protocol (LRTP).
   saleem, Jan2024, Feb2023.
   checked March 2025 (sjm55)
   revised March 2026 (sjm55)

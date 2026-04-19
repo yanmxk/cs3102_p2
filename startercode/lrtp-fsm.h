@@ -11,8 +11,6 @@
   revised March 2026 (sjm55)
 */
 
-/* CS3102: you can use the states defined below, or define your own */
-
 typedef enum LRTP_state_e {
   LRTP_state_error = -1, // -1 problem with state
   LRTP_state_closed,     //  0 connection closed
@@ -23,8 +21,6 @@ typedef enum LRTP_state_e {
   LRTP_state_closing_i,  //  5 closing initiated (@server or @client)
   LRTP_state_closing_r   //  6 closing responder (@server or @client)
 } LRTP_state_t;
-
-/* CS3102: add anything else here if needed */
 
 /* Adaptive RTO calculation based on RTT measurements (like TCP) */
 uint32_t lrtp_calculate_adaptive_rto(uint32_t rtt, uint32_t *srtt, uint32_t *rttvar);

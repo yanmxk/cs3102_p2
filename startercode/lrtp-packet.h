@@ -44,7 +44,4 @@ typedef struct Lrtp_Packet_s {
     uint8_t       payload[LRTP_MAX_DATA_SIZE];
 } Lrtp_Packet_t;
 
-
-/* CS3012 : put in here whatever else you need */
-
 #endif /* __lrtp_packet_h__ */

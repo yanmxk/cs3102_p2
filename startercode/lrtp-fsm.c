@@ -58,10 +58,6 @@ lrtp_calculate_adaptive_rto(uint32_t rtt, uint32_t *srtt, uint32_t *rttvar)
   return rto;
 }
 
-/*
-  CS3012 : add anything you need
-*/
-
 void
 dummy_can_be_removed()
 { /*

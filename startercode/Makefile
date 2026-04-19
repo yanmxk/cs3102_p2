@@ -151,15 +151,20 @@ TMUX_SESSION ?= lrtp_test_$(shell basename "$(CURDIR)")
 
 define LAUNCH_TMUX_PAIR
 	if [ -z "$(TMUX)" ]; then echo "tmux not found. Install tmux or set TERMINAL to use external terminals."; exit 1; fi; \
-	# Kill any existing session with same name to start fresh
-	if $(TMUX) has-session -t $(TMUX_SESSION) 2>/dev/null; then $(TMUX) kill-session -t $(TMUX_SESSION); fi; \
-	# Create new session with server in left pane
-	$(TMUX) new-session -d -s $(TMUX_SESSION) 'cd "$(CURDIR)"; $(1)'; \
-	# split horizontally and run client in right pane
-	$(TMUX) split-window -h -t $(TMUX_SESSION) 'cd "$(CURDIR)"; $(2)'; \
-	# select left pane and attach (user sees split panes)
-	$(TMUX) select-pane -L -t $(TMUX_SESSION); \
-	$(TMUX) attach-session -t $(TMUX_SESSION)
+	# Kill existing session (ignore errors)
+	$(TMUX) has-session -t $(TMUX_SESSION) 2>/dev/null && $(TMUX) kill-session -t $(TMUX_SESSION) 2>/dev/null || true; \
+	# Create session detached with server command
+	$(TMUX) new-session -d -s $(TMUX_SESSION) bash -lc 'cd "$(CURDIR)" && exec $(1)'; \
+	# split horizontally and run client command
+	$(TMUX) split-window -h -t $(TMUX_SESSION) bash -lc 'cd "$(CURDIR)" && exec $(2)'; \
+	# select left pane (server)
+	$(TMUX) select-pane -L -t $(TMUX_SESSION) 2>/dev/null || true; \
+	# Attach if interactive; otherwise just inform how to attach
+	if [ -t 1 ]; then \
+		$(TMUX) attach-session -t $(TMUX_SESSION) 2>/dev/null || { echo "Created tmux session '$(TMUX_SESSION)' but failed to attach. Attach manually with: tmux attach -t $(TMUX_SESSION)"; }; \
+	else \
+		echo "Created tmux session '$(TMUX_SESSION)'. Attach with: tmux attach -t $(TMUX_SESSION)"; \
+	fi
 endef
 
 .PHONY: run_test_adaptive run_test_0 run_test_1 run_test_2 run_test_3 \

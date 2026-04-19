@@ -150,14 +150,14 @@ run_test_adaptive: test-adaptive-rto-server test-adaptive-rto-client
 	@echo "Launching adaptive RTO server and client in new terminal windows..."
 	@TER="$(TERMINAL)"; \
 	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD='cd "$(CURDIR)"; ./test-adaptive-rto-server 24536; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	HOST="$${MAKE_HOST:-}"; \
-	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD2="cd \"$(CURDIR)\"; ./test-adaptive-rto-client $$HOST 24536 10; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
@@ -172,14 +172,14 @@ run_test_0: test-server-0 test-client-0
 	@echo "Launching test-client-0/test-server-0..."
 	@TER="$(TERMINAL)"; \
 	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD='cd "$(CURDIR)"; ./test-server-0; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	HOST="$${MAKE_HOST:-}"; \
-	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD2="cd \"$(CURDIR)\"; ./test-client-0 $$HOST; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
@@ -190,14 +190,14 @@ run_test_1: test-server-1 test-client-1
 	@echo "Launching test-client-1/test-server-1..."
 	@TER="$(TERMINAL)"; \
 	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD='cd "$(CURDIR)"; ./test-server-1; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	HOST="$${MAKE_HOST:-}"; \
-	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD2="cd \"$(CURDIR)\"; ./test-client-1 $$HOST; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
@@ -208,14 +208,14 @@ run_test_2: test-server-2 test-client-2
 	@echo "Launching test-client-2/test-server-2..."
 	@TER="$(TERMINAL)"; \
 	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD='cd "$(CURDIR)"; ./test-server-2; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	HOST="$${MAKE_HOST:-}"; \
-	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD2="cd \"$(CURDIR)\"; ./test-client-2 $$HOST; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
@@ -226,14 +226,14 @@ run_test_3: test-server-3 test-client-3
 	@echo "Launching test-client-3/test-server-3..."
 	@TER="$(TERMINAL)"; \
 	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD='cd "$(CURDIR)"; ./test-server-3; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	HOST="$${MAKE_HOST:-}"; \
-	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD2="cd \"$(CURDIR)\"; ./test-client-3 $$HOST; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
@@ -244,14 +244,14 @@ run_test_large_transfer: test-large-transfer-server test-large-transfer-client
 	@echo "Launching large-transfer server and client..."
 	@TER="$(TERMINAL)"; \
 	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD='cd "$(CURDIR)"; ./test-large-transfer-server 24536; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	HOST="$${MAKE_HOST:-}"; \
-	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD2="cd \"$(CURDIR)\"; ./test-large-transfer-client $$HOST 24536; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
@@ -262,14 +262,14 @@ run_test_multiple_sends: test-multiple-sends-server test-multiple-sends-client
 	@echo "Launching multiple-sends server and client..."
 	@TER="$(TERMINAL)"; \
 	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD='cd "$(CURDIR)"; ./test-multiple-sends-server 24536; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	HOST="$${MAKE_HOST:-}"; \
-	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD2="cd \"$(CURDIR)\"; ./test-multiple-sends-client $$HOST 24536; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
@@ -280,14 +280,14 @@ run_test_stress: test-stress-server test-stress-client
 	@echo "Launching stress server and client..."
 	@TER="$(TERMINAL)"; \
 	if [ -z "$$TER" ]; then echo "No terminal emulator found. Set TERMINAL env var."; exit 1; fi; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD='cd "$(CURDIR)"; ./test-stress-server 24536; echo "Server exited"; read -n 1 -s -r -p "Press any key to close"'; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	HOST="$${MAKE_HOST:-}"; \
-	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
 	CMD2="cd \"$(CURDIR)\"; ./test-stress-client $$HOST 24536; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \

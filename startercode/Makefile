@@ -156,7 +156,9 @@ run_test_adaptive: test-adaptive-rto-server test-adaptive-rto-client
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-adaptive-rto-client pc1-034-l 24536 10; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
+	CMD2="cd \"$(CURDIR)\"; ./test-adaptive-rto-client $$HOST 24536 10; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
@@ -176,7 +178,9 @@ run_test_0: test-server-0 test-client-0
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-client-0 pc1-034-l; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
+	CMD2="cd \"$(CURDIR)\"; ./test-client-0 $$HOST; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
@@ -192,7 +196,9 @@ run_test_1: test-server-1 test-client-1
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-client-1 pc1-034-l; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
+	CMD2="cd \"$(CURDIR)\"; ./test-client-1 $$HOST; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
@@ -208,7 +214,9 @@ run_test_2: test-server-2 test-client-2
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-client-2 pc1-034-l; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
+	CMD2="cd \"$(CURDIR)\"; ./test-client-2 $$HOST; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
@@ -224,7 +232,9 @@ run_test_3: test-server-3 test-client-3
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-client-3 pc1-034-l; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
+	CMD2="cd \"$(CURDIR)\"; ./test-client-3 $$HOST; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
@@ -240,7 +250,9 @@ run_test_large_transfer: test-large-transfer-server test-large-transfer-client
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-large-transfer-client pc1-034-l 24536; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
+	CMD2="cd \"$(CURDIR)\"; ./test-large-transfer-client $$HOST 24536; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
@@ -256,7 +268,9 @@ run_test_multiple_sends: test-multiple-sends-server test-multiple-sends-client
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-multiple-sends-client pc1-034-l 24536; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
+	CMD2="cd \"$(CURDIR)\"; ./test-multiple-sends-client $$HOST 24536; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \
@@ -272,7 +286,9 @@ run_test_stress: test-stress-server test-stress-client
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD"; \
 	else $$TER -e bash -lc "$$CMD"; fi; \
 	sleep 1; \
-	CMD2='cd "$(CURDIR)"; ./test-stress-client pc1-034-l 24536; echo "Client exited"; read -n 1 -s -r -p "Press any key to close"'; \
+	HOST="$${MAKE_HOST:-}"; \
+	if [ -z "$$HOST" ]; then printf "Enter hostname or IP to connect to: "; read -r HOST; fi; \
+	CMD2="cd \"$(CURDIR)\"; ./test-stress-client $$HOST 24536; echo \"Client exited\"; read -n 1 -s -r -p \"Press any key to close\""; \
 	if [ "$$TER" = "gnome-terminal" ]; then $$TER -- bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "xterm" ]; then $$TER -hold -e bash -lc "$$CMD2"; \
 	elif [ "$$TER" = "konsole" ]; then $$TER -e bash -lc "$$CMD2"; \

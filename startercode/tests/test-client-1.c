@@ -31,7 +31,6 @@ main(int argc, char *argv[])
   char remote[22];
   int n = 100000; // same as test-server-1.c
   int rx_pkts = 0, rx_fails = 0;
-
   if (argc < 2) {
     printf("usage: test-client-1 <fqdn> [port]\n");
     exit(0);

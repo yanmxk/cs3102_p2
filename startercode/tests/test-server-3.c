@@ -31,9 +31,8 @@ main(int argc, char **argv)
   int n = 100000; // same as test-server-3.c
   int rx_pkts = 0, tx_pkts = 0, rx_fails = 0, tx_fails = 0;
 
-  if (argc != 1) {
-    printf("usage: test-server-3\n");
-    exit(0);
+  if (argc > 1) {
+    port = (uid_t)atoi(argv[1]);
   }
   printf("test-server-3\n");
 

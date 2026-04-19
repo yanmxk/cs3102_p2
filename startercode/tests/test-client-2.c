@@ -32,12 +32,15 @@ main(int argc, char *argv[])
   int n = 100000; // same as test-server-2.c
   int tx_pkts = 0, tx_fails = 0;
 
-  if (argc != 2) {
-    printf("usage: test-client-2 <fqdn>\n");
+  if (argc < 2) {
+    printf("usage: test-client-2 <fqdn> [port]\n");
     exit(0);
   }
   printf("test-client-2\n");
 
+  if (argc > 2) {
+    port = (uid_t)atoi(argv[2]);
+  }
   if (port < 1024)
     port += 1024; // hack, avoid reserved ports, should not happen in labs
 

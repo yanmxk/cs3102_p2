@@ -30,6 +30,9 @@ main(int argc, char **argv)
 
   printf("test-server-0\n");
 
+  if (argc > 1) {
+    port = (uid_t)atoi(argv[1]);
+  }
   if (port < 1024)
     port += 1024; // hack, avoid reserved ports, should not happen in labs
 

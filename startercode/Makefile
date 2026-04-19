@@ -159,9 +159,16 @@ define LAUNCH_TMUX_PAIR
 	$(TMUX) split-window -h -t $(TMUX_SESSION) bash -lc 'cd "$(CURDIR)" && exec $(2)'; \
 	# select left pane (server)
 	$(TMUX) select-pane -L -t $(TMUX_SESSION) 2>/dev/null || true; \
+	# prepare log files for panes
+	SERVER_LOG="$(CURDIR)/$(TMUX_SESSION)_server.log"; \
+	CLIENT_LOG="$(CURDIR)/$(TMUX_SESSION)_client.log"; \
+	rm -f "$$SERVER_LOG" "$$CLIENT_LOG"; \
+	# pipe panes to log files (pane 0 = server, pane 1 = client)
+	$(TMUX) pipe-pane -t $(TMUX_SESSION):0.0 -o "cat >'$$SERVER_LOG'" 2>/dev/null || true; \
+	$(TMUX) pipe-pane -t $(TMUX_SESSION):0.1 -o "cat >'$$CLIENT_LOG'" 2>/dev/null || true; \
 	# Attach if interactive; otherwise just inform how to attach
 	if [ -t 1 ]; then \
-		$(TMUX) attach-session -t $(TMUX_SESSION) 2>/dev/null || { echo "Created tmux session '$(TMUX_SESSION)' but failed to attach. Attach manually with: tmux attach -t $(TMUX_SESSION)"; }; \
+		$(TMUX) attach-session -t $(TMUX_SESSION) 2>/dev/null || { echo "Created tmux session '$(TMUX_SESSION)' but failed to attach. Tailing logs..."; sleep 1; tail -f "$$SERVER_LOG" "$$CLIENT_LOG"; }; \
 	else \
 		echo "Created tmux session '$(TMUX_SESSION)'. Attach with: tmux attach -t $(TMUX_SESSION)"; \
 	fi

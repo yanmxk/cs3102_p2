@@ -28,7 +28,11 @@
 
 extern Lrtp_Pcb_t G_pcb;
 
-/* Helper: Set socket receive timeout in microseconds */
+/*
+  Set socket receive timeout in microseconds
+  Calculates timeval struct and calls setsockopt() to set SO_RCVTIMEO on the socket.
+  Returns 0 on success, -1 on failure (with errno set by setsockopt).
+*/
 static int set_recv_timeout(int sd, uint32_t timeout_us)
 {
   struct timeval tv;
@@ -37,17 +41,23 @@ static int set_recv_timeout(int sd, uint32_t timeout_us)
   return setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 }
 
+/*
+  Initialize the LRTP protocol control block and any other necessary state.
+*/
 void lrtp_init()
 {
-  reset_LrtpPcb();
+  reset_LrtpPcb(); // reset G_pcb to starting values
 }
 
 /*
-  port : local port number to be used for socket
-  return : error - lrtp-common.h
-           success - valid socket descriptor
+  Set up a socket and listen for incoming connection requests on the specified port.
 
-  For use by server process.
+  Arguments:
+    port: local port number to be used for socket
+
+  Return:
+    error   - lrtp-common.h
+    success - valid socket descriptor
 */
 int lrtp_start(uint16_t port)
 {
@@ -58,7 +68,7 @@ int lrtp_start(uint16_t port)
     return LRTP_ERROR;
   }
 
-  int reuse = 1;
+  int reuse = 1; // allow reuse of local address for quick restart after close
   if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0)
   {
     perror("setsockopt");
@@ -79,6 +89,7 @@ int lrtp_start(uint16_t port)
     return LRTP_ERROR;
   }
 
+  // Update protocol control block with local socket info and state
   G_pcb.sd = sd;
   G_pcb.port = port;
   G_pcb.local = local;
@@ -88,15 +99,18 @@ int lrtp_start(uint16_t port)
 }
 
 /*
-  sd : socket descriptor as previously provided by lrtp_start()
-  return : error - lrtp-common.h
-           success - sd, to indicate sd now also is "connected"
+  Accept an incoming connection request on a listening socket.
 
-  For use by server process.
+  Arguments:
+    sd: socket descriptor as previously provided by lrtp_start()
+
+  Return :
+    error   - lrtp-common.h
+    success - sd, to indicate sd now also is connected
 */
 int lrtp_accept(int sd)
 {
-  if (G_pcb.state != LRTP_state_listening)
+  if (G_pcb.state != LRTP_state_listening) // must be in listening state to accept
   {
     return LRTP_ERROR_fsm;
   }
@@ -105,10 +119,10 @@ int lrtp_accept(int sd)
   struct sockaddr_in remote;
   socklen_t remote_len = sizeof(remote);
 
-  /* Set timeout for initial open_req */
-  set_recv_timeout(sd, 5000000); /* 5 second timeout */
+  // Set timeout for initial open_req
+  set_recv_timeout(sd, 5000000); // 5 sec
 
-  /* Receive open_req */
+  // Wait for open_req with retransmissions
   memset(&pkt, 0, sizeof(pkt));
   memset(&remote, 0, sizeof(remote));
 
@@ -120,18 +134,19 @@ int lrtp_accept(int sd)
     perror("recvfrom open_req");
     return LRTP_ERROR;
   }
-  // 1st step in 3-ways handshake: receive open_req
+  // 1st step in 3-way handshake: receive open_req
   if (pkt.hdr.type != LRTP_TYPE_open_req)
   {
     return LRTP_ERROR;
   }
 
+  // Update protocol control block with remote socket info, initial sequence numbers, and state
   G_pcb.remote = remote;
   G_pcb.seq_rx = pkt.hdr.seq + 1;
   G_pcb.start_time = lrtp_timestamp();
   G_pcb.open_req_rx++;
 
-  /* Send open_reqack */
+  // 2nd step in 3-way handshake: send open_reqack
   G_pcb.state = LRTP_state_opening_r; // receiver
   memset(&pkt, 0, sizeof(pkt));
   pkt.hdr.type = LRTP_TYPE_open_reqack;
@@ -144,9 +159,10 @@ int lrtp_accept(int sd)
     perror("sendto");
     return LRTP_ERROR;
   }
+  // Update protocol control block with open_reqack transmission count
   G_pcb.open_reqack_tx++;
 
-  /* Wait for open_ack with retransmissions */
+  // Wait for open_ack with retransmissions
   set_recv_timeout(sd, G_pcb.rto);
   int retries = 0;
 
@@ -155,7 +171,7 @@ int lrtp_accept(int sd)
     memset(&pkt, 0, sizeof(pkt));
     remote_len = sizeof(G_pcb.remote);
 
-    /* Record timestamp for first open_reqack sent (for RTT measurement) */
+    // Record timestamp for first open_reqack sent (for RTT measurement)
     if (retries == 0 && G_pcb.tx_timestamp == 0)
     {
       G_pcb.tx_timestamp = lrtp_timestamp();
@@ -166,7 +182,7 @@ int lrtp_accept(int sd)
 
     if (n < 0)
     {
-      /* Timeout - resend open_reqack */
+      // Timeout - resend open_reqack
       Lrtp_Packet_t resp;
       memset(&resp, 0, sizeof(resp));
       resp.hdr.type = LRTP_TYPE_open_reqack;
@@ -183,27 +199,39 @@ int lrtp_accept(int sd)
       continue;
     }
 
+    // 3rd step in 3-way handshake: receive open_ack
     if (pkt.hdr.type == LRTP_TYPE_open_ack)
     {
-      G_pcb.open_ack_rx++;
-      G_pcb.seq_tx++; /* Increment for data phase */
-      G_pcb.state = LRTP_state_connected;
-      
-      /* Calculate RTT and update adaptive RTO on first successful reception */
-      if (G_pcb.tx_timestamp > 0)
+      /* Count duplicates if already seen an open_ack */
+      if (G_pcb.open_ack_rx == 0)
       {
-        uint64_t now = lrtp_timestamp();
-        uint32_t rtt = (uint32_t)(now - G_pcb.tx_timestamp);
-        G_pcb.rtt = rtt;
-        G_pcb.rto = lrtp_calculate_adaptive_rto(rtt, &G_pcb.srtt, &G_pcb.rttvar);
+        G_pcb.open_ack_rx++;
+        G_pcb.seq_tx++; // increment seq for next transmission
+        G_pcb.state = LRTP_state_connected;
+
+        /* Calculate RTT and update adaptive RTO on first successful reception */
+        if (G_pcb.tx_timestamp > 0)
+        {
+          uint64_t now = lrtp_timestamp();
+          uint32_t rtt = (uint32_t)(now - G_pcb.tx_timestamp);
+          G_pcb.rtt = rtt;
+          G_pcb.rto = lrtp_calculate_adaptive_rto(rtt, &G_pcb.srtt, &G_pcb.rttvar); // req3
+        }
+
+        return sd;
       }
-      
-      return sd;
+      else
+      {
+        G_pcb.open_ack_dup_rx++;
+        /* ignore duplicate and continue waiting */
+      }
     }
+    // If received packet is not open_ack, check if it's a duplicate open_req
     else if (pkt.hdr.type == LRTP_TYPE_open_req)
-    { // duplicate open_req
+    {
       G_pcb.open_req_dup_rx++;
-      /* Resend open_reqack */
+
+      // Resend open_reqack
       Lrtp_Packet_t resp;
       memset(&resp, 0, sizeof(resp));
       resp.hdr.type = LRTP_TYPE_open_reqack;
@@ -215,6 +243,7 @@ int lrtp_accept(int sd)
         perror("sendto dup");
         return LRTP_ERROR;
       }
+      // Update protocol control block with duplicate open_req reception and open_reqack retransmission counts
       G_pcb.open_reqack_re_tx++;
     }
   }
@@ -223,11 +252,15 @@ int lrtp_accept(int sd)
 }
 
 /*
-  port : local and remote port number to be used for socket
-  return : error - LRTP_ERROR
-           success - valid socket descriptor
+  Open a connection to a server at the specified fully qualified domain name (FQDN) and port.
 
-  For use by client process.
+  Arguments:
+    fqdn: fully qualified domain name of the server
+    port: local and remote port number to be used for socket
+
+  Return:
+    error - LRTP_ERROR
+    success - valid socket descriptor
 */
 int lrtp_open(const char *fqdn, uint16_t port)
 {
@@ -246,6 +279,7 @@ int lrtp_open(const char *fqdn, uint16_t port)
     return LRTP_ERROR;
   }
 
+  // Set up remote and local socket addresses
   struct sockaddr_in remote;
   memset(&remote, 0, sizeof(remote));
   remote.sin_family = AF_INET;
@@ -273,6 +307,7 @@ int lrtp_open(const char *fqdn, uint16_t port)
     return LRTP_ERROR;
   }
 
+  // Update protocol control block with socket info and initial state
   G_pcb.sd = sd;
   G_pcb.port = port;
   G_pcb.remote = remote;
@@ -280,7 +315,7 @@ int lrtp_open(const char *fqdn, uint16_t port)
   G_pcb.state = LRTP_state_opening_i; // initiator
   G_pcb.start_time = lrtp_timestamp();
 
-  /* 3-way handshake */
+  // 3-way handshake with retransmissions for open_req and open_reqack
   set_recv_timeout(sd, G_pcb.rto);
   Lrtp_Packet_t pkt;
   int retries = 0;
@@ -292,7 +327,7 @@ int lrtp_open(const char *fqdn, uint16_t port)
     pkt.hdr.seq = G_pcb.seq_tx;
     pkt.hdr.data_size = 0;
 
-    /* Record send timestamp for RTT measurement */
+    // Record send timestamp for RTT measurement on first transmission of open_req
     if (retries == 0)
     {
       G_pcb.tx_timestamp = lrtp_timestamp();
@@ -310,39 +345,52 @@ int lrtp_open(const char *fqdn, uint16_t port)
     else
       G_pcb.open_req_re_tx++;
 
-    /* Try to receive open_reqack */
+    // Try to receive open_reqack with timeout and retransmissions
     memset(&pkt, 0, sizeof(pkt));
     int n = recvfrom(sd, (void *)&pkt, sizeof(pkt), 0, NULL, NULL);
 
-    if (n > 0 && pkt.hdr.type == LRTP_TYPE_open_reqack)
+    if (n > 0)
     {
-      G_pcb.open_reqack_rx++;
-      G_pcb.seq_rx = pkt.hdr.seq + 1;
-      
-      /* Calculate RTT and update adaptive RTO on first successful reception */
-      if (retries == 0)
+      if (pkt.hdr.type == LRTP_TYPE_open_reqack) // received expected open_reqack, proceed with handshake completion
       {
-        uint64_t now = lrtp_timestamp();
-        uint32_t rtt = (uint32_t)(now - G_pcb.tx_timestamp);
-        G_pcb.rtt = rtt;
-        G_pcb.rto = lrtp_calculate_adaptive_rto(rtt, &G_pcb.srtt, &G_pcb.rttvar);
+        G_pcb.open_reqack_rx++;
+        G_pcb.seq_rx = pkt.hdr.seq + 1;
+
+        // Calculate RTT and update adaptive RTO on first successful reception */
+        if (retries == 0)
+        {
+          uint64_t now = lrtp_timestamp();
+          uint32_t rtt = (uint32_t)(now - G_pcb.tx_timestamp);
+          G_pcb.rtt = rtt;
+          G_pcb.rto = lrtp_calculate_adaptive_rto(rtt, &G_pcb.srtt, &G_pcb.rttvar);
+        }
+
+        break;
       }
-      
-      break;
+      else if (pkt.hdr.type == LRTP_TYPE_open_req) // received duplicate open_req, resend open_reqack
+      {
+        // Duplicate open_req received from server side: count and ignore
+        G_pcb.open_req_dup_rx++;
+      }
+      else
+      {
+        // Unexpected packet type while waiting for open_reqack - ignore and continue waiting
+      }
     }
 
     retries++;
-    /* Update timeout for retransmissions */
+    // Update timeout for retransmissions
     set_recv_timeout(sd, G_pcb.rto);
   }
 
+  // If exhausted all retries without receiving open_reqack, return error
   if (retries > LRTP_MAX_RE_TX)
   {
     close(sd);
     return LRTP_ERROR;
   }
 
-  /* Send open_ack */
+  // Send open_ack to complete 3-way handshake
   memset(&pkt, 0, sizeof(pkt));
   pkt.hdr.type = LRTP_TYPE_open_ack;
   pkt.hdr.seq = G_pcb.seq_tx;
@@ -356,22 +404,24 @@ int lrtp_open(const char *fqdn, uint16_t port)
     return LRTP_ERROR;
   }
   G_pcb.open_ack_tx++;
-  G_pcb.seq_tx++; /* Increment for data phase */
+  G_pcb.seq_tx++;
   G_pcb.state = LRTP_state_connected;
 
   return sd;
 }
 
 /*
-  port : local and remote port number to be used for socket
-  return : error - LRTP_ERROR
-           success - LRTP_SUCCESS
+  Close the connection associated with the given socket descriptor.
+  Arguments:
+    sd : socket descriptor as previously provided by lrtp_start() and lrtp_accept() or lrtp_open()
 
-  For use by client process.
+  Return:
+    error - LRTP_ERROR
+    success - LRTP_SUCCESS
 */
 int lrtp_close(int sd)
 {
-  if (G_pcb.state != LRTP_state_connected)
+  if (G_pcb.state != LRTP_state_connected) // must be in connected state to close
   {
     return LRTP_ERROR_fsm;
   }
@@ -380,6 +430,7 @@ int lrtp_close(int sd)
 
   Lrtp_Packet_t pkt;
   int retries = 0;
+  int success = 0;
 
   while (retries <= LRTP_MAX_RE_TX)
   {
@@ -392,11 +443,14 @@ int lrtp_close(int sd)
                (struct sockaddr *)&G_pcb.remote, sizeof(G_pcb.remote)) < 0)
     {
       perror("sendto");
-      goto close_exit;
+      G_pcb.finish_time = lrtp_timestamp();
+      close(sd);
+      return LRTP_ERROR;
     }
-    if (retries == 0)
+
+    if (retries == 0) // first transmission of close_req
       G_pcb.close_req_tx++;
-    else
+    else // retransmissions of close_req
       G_pcb.close_req_re_tx++;
 
     memset(&pkt, 0, sizeof(pkt));
@@ -406,30 +460,42 @@ int lrtp_close(int sd)
     {
       G_pcb.close_ack_rx++;
       G_pcb.state = LRTP_state_closed;
-      goto close_exit;
+      success = 1;
+      break; // exit loop cleanly
     }
 
     retries++;
+    // Update timeout for retransmissions
+    set_recv_timeout(sd, G_pcb.rto);
+  }
+  // If exhausted all retries without receiving close_ack, transition to closing state
+  if (!success)
+  {
+    G_pcb.state = LRTP_state_closing_i;
   }
 
-  G_pcb.state = LRTP_state_closing_i;
-
-close_exit:
+  // Record finish time for connection closure, whether successful or not
   G_pcb.finish_time = lrtp_timestamp();
   close(sd);
+
   return LRTP_SUCCESS;
 }
 
 /*
-  sd : socket descriptor
-  data : buffer with bytestream to transmit
-  data_size : number of bytes to transmit
-  return : error - LRTP_ERROR
-           success - number of bytes transmitted
+  Transmit data over the LRTP connection.
+
+  Arguments:
+    sd: socket descriptor
+    data: buffer with bytestream to transmit
+    data_size: number of bytes to transmit
+
+  Return:
+    error   - LRTP_ERROR
+    success - number of bytes transmitted
 */
 int lrtp_tx(int sd, void *data, uint16_t data_size)
 {
-  if (G_pcb.state != LRTP_state_connected)
+  if (G_pcb.state != LRTP_state_connected) // must be in connected state to transmit
   {
     return LRTP_ERROR_fsm;
   }
@@ -447,7 +513,7 @@ int lrtp_tx(int sd, void *data, uint16_t data_size)
     pkt.hdr.data_size = data_size;
     memcpy(pkt.payload, data, data_size);
 
-    /* Record send timestamp for RTT measurement */
+    // Record send timestamp for RTT measurement
     if (retries == 0)
     {
       G_pcb.tx_timestamp = lrtp_timestamp();
@@ -459,12 +525,12 @@ int lrtp_tx(int sd, void *data, uint16_t data_size)
       perror("sendto");
       return LRTP_ERROR;
     }
-    if (retries == 0)
+    if (retries == 0) // first transmission of data_req
     {
       G_pcb.data_req_tx++;
       G_pcb.data_req_bytes_tx += data_size;
     }
-    else
+    else // retransmissions of data_req
     {
       G_pcb.data_req_re_tx++;
       G_pcb.data_req_bytes_re_tx += data_size;
@@ -476,8 +542,8 @@ int lrtp_tx(int sd, void *data, uint16_t data_size)
     if (n > 0 && pkt.hdr.type == LRTP_TYPE_data_ack && pkt.hdr.seq == G_pcb.seq_tx - 1)
     {
       G_pcb.data_ack_rx++;
-      
-      /* Calculate RTT and update adaptive RTO */
+
+      // Calculate RTT and update adaptive RTO
       if (retries == 0)
       {
         uint64_t now = lrtp_timestamp();
@@ -485,12 +551,12 @@ int lrtp_tx(int sd, void *data, uint16_t data_size)
         G_pcb.rtt = rtt;
         G_pcb.rto = lrtp_calculate_adaptive_rto(rtt, &G_pcb.srtt, &G_pcb.rttvar);
       }
-      
+
       return data_size;
     }
 
     retries++;
-    /* Update timeout for retransmissions */
+    // Update timeout for retransmissions
     set_recv_timeout(sd, G_pcb.rto);
   }
 
@@ -498,20 +564,25 @@ int lrtp_tx(int sd, void *data, uint16_t data_size)
 }
 
 /*
-  sd : socket descriptor
-  data : buffer to store bytestream received
-  data_size : size of buffer
-  return : error - LRTP_ERROR
-           success - number of bytes received
+  Receive data over the LRTP connection.
+
+  Arguments:
+    sd: socket descriptor
+    data: buffer to store bytestream received
+    data_size: size of buffer
+
+    Return:
+    error   - LRTP_ERROR
+    success - number of bytes received
 */
 int lrtp_rx(int sd, void *data, uint16_t data_size)
 {
-  if (G_pcb.state != LRTP_state_connected)
+  if (G_pcb.state != LRTP_state_connected) // must be in connected state to receive
   {
     return LRTP_ERROR_fsm;
   }
 
-  set_recv_timeout(sd, LRTP_RTO_FIXED * 10);
+  set_recv_timeout(sd, LRTP_RTO_FIXED * 10); // long timeout for receiving data_req, to allow for multiple retransmissions if needed
 
   while (1)
   {
@@ -524,12 +595,14 @@ int lrtp_rx(int sd, void *data, uint16_t data_size)
       return LRTP_ERROR;
     }
 
-    if (pkt.hdr.type == LRTP_TYPE_data_req)
+    if (pkt.hdr.type == LRTP_TYPE_data_req) // received data_req, check sequence number and send appropriate ack
     {
-      if (pkt.hdr.seq == G_pcb.seq_rx)
+      if (pkt.hdr.seq == G_pcb.seq_rx) // expected sequence number, accept and ack
       {
+        // Calculate payload size to copy, which may be less than data_size if packet's data_size is smaller
         uint16_t payload_size = (pkt.hdr.data_size < data_size) ? pkt.hdr.data_size : data_size;
         memcpy(data, pkt.payload, payload_size);
+        // Update protocol control block with received data info and advance expected sequence number
         G_pcb.seq_rx++;
         G_pcb.data_req_rx++;
         G_pcb.data_req_bytes_rx += payload_size;
@@ -545,7 +618,7 @@ int lrtp_rx(int sd, void *data, uint16_t data_size)
 
         return payload_size;
       }
-      else if (pkt.hdr.seq < G_pcb.seq_rx)
+      else if (pkt.hdr.seq < G_pcb.seq_rx) // duplicate packet (already received and acked), resend ack but do not update state
       {
         G_pcb.data_req_dup_rx++;
         G_pcb.data_req_bytes_dup_rx += pkt.hdr.data_size;
@@ -561,7 +634,7 @@ int lrtp_rx(int sd, void *data, uint16_t data_size)
       }
       continue;
     }
-    else if (pkt.hdr.type == LRTP_TYPE_close_req)
+    else if (pkt.hdr.type == LRTP_TYPE_close_req) // received close_req, send close_ack and transition to closing state
     {
       G_pcb.close_req_rx++;
       G_pcb.state = LRTP_state_closing_i;
@@ -576,6 +649,10 @@ int lrtp_rx(int sd, void *data, uint16_t data_size)
       G_pcb.close_ack_tx++;
 
       return LRTP_ERROR;
+    }
+    else
+    {
+      // Received unexpected packet type while waiting for data_req - ignore and continue waiting
     }
   }
 }

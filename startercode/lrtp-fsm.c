@@ -57,12 +57,3 @@ lrtp_calculate_adaptive_rto(uint32_t rtt, uint32_t *srtt, uint32_t *rttvar)
   
   return rto;
 }
-
-void
-dummy_can_be_removed()
-{ /*
-    CS3102
-    This function can be removed -- its presence stops a warning
-    from ar(1) / ranlib(1) when this file is empty.
-  */
-}

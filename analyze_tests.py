@@ -211,6 +211,7 @@ class LRTPTestAnalyzer:
             print(f"[*] Running test servers on port {self.config.server_port}...")
         
         server_processes = []
+        crashed_pids = set()  # Track already-reported crashes
         try:
             # For simplicity, get available ports for each server
             ports = {}
@@ -240,12 +241,25 @@ class LRTPTestAnalyzer:
             
             # Keep servers running
             print("\n[+] All servers running. Press Ctrl+C to stop.")
+            check_interval = 0
             while True:
-                time.sleep(1)
-                # Check if any server crashed
-                for name, port, proc in server_processes:
-                    if proc.poll() is not None:
-                        print(f"[!] {name} on port {port} crashed")
+                time.sleep(0.5)
+                check_interval += 0.5
+                
+                # Only check for crashes every 5 seconds to reduce spam
+                if check_interval >= 5:
+                    check_interval = 0
+                    for name, port, proc in server_processes:
+                        if proc.poll() is not None and proc.pid not in crashed_pids:
+                            crashed_pids.add(proc.pid)
+                            # Get any output for debugging
+                            stdout_data = proc.stdout.read() if proc.stdout else ""
+                            stderr_data = proc.stderr.read() if proc.stderr else ""
+                            print(f"\n[!] {name} on port {port} crashed (exit code: {proc.returncode})")
+                            if stderr_data:
+                                print(f"    Error output: {stderr_data[:200]}")
+                            if stdout_data:
+                                print(f"    Output: {stdout_data[:200]}")
         
         except KeyboardInterrupt:
             print("\n[*] Stopping servers...")

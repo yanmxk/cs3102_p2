@@ -1,0 +1,73 @@
+Adaptive RTO Test Server
+Listening on port 24536
+
+start() OK
+Connection accepted
+Client RTO (adaptive): 1000000 us (1.000 s)
+
+Packet |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   | Bytes RX
+--------|--------------|--------------|--------------|--------------|----------
+      1 |          337 |          337 |          168 |      1000000 |     1280
+      2 |          337 |          337 |          168 |      1000000 |     1280
+      3 |          337 |          337 |          168 |      1000000 |     1280
+      4 |          337 |          337 |          168 |      1000000 |     1280
+      5 |          337 |          337 |          168 |      1000000 |     1280
+      6 |          337 |          337 |          168 |      1000000 |     1280
+      7 |          337 |          337 |          168 |      1000000 |     1280
+      8 |          337 |          337 |          168 |      1000000 |     1280
+      9 |          337 |          337 |          168 |      1000000 |     1280
+     10 |          337 |          337 |          168 |      1000000 |     1280
+
+Connection closed
+
+Final RTO Statistics (Server View):
+  Smoothed RTT: 337 us (0.337 ms)
+  RTT Variance: 168 us (0.168 ms)
+  RTO: 1000000 us (1.000 s)
+  Packets received: 10
+  Total bytes received: 12800
+start_time: 2026-04-21_15:00:14 (1776780014.046377s)
+(now): 2026-04-21_15:00:14 (1776780014.049147s)
+(duration): 0.002770s
+sd: 3
+port: 24536
+local: 0.0.0.0 24536
+remote: 138.251.28.52 33624
+state: 5 (closing_i)
+seq_tx: 3
+seq_rx: 12
+rtt: 337 us
+rto: 1000000 us
+open_req_rx: 1
+open_req_dup_rx: 0
+open_reqack_rx: 0
+open_reqack_dup_rx: 0
+open_ack_rx: 1
+open_ack_dup_rx: 0
+open_req_tx: 0
+open_req_re_tx: 0
+open_reqack_tx: 1
+open_reqack_re_tx: 0
+open_ack_tx: 0
+open_ack_re_tx: 0
+data_req_rx: 10
+data_req_bytes_rx: 12800
+data_ack_rx: 0
+data_req_dup_rx: 0
+data_req_bytes_dup_rx: 0
+data_ack_dup_rx: 0
+data_req_tx: 0
+data_req_bytes_tx: 0
+data_ack_tx: 10
+data_req_re_tx: 0
+data_req_bytes_re_tx: 0
+data_ack_re_tx: 0
+close_req_rx: 1
+close_req_dup_rx: 0
+close_ack_rx: 0
+close_ack_dup_rx: 0
+close_req_tx: 0
+close_req_re_tx: 0
+close_ack_tx: 1
+close_ack_re_tx: 0
+data mean rx_rate: 36.97 Mbps - 36967509 bps

@@ -1,0 +1,74 @@
+Adaptive RTO Test Client
+Connect to pc8-002-l:24536
+Sending 10 packets of 1280 bytes each
+
+Connection established (adaptive RTO initialized)
+Initial RTO: 1000000 us (1.000 s)
+
+Packet |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   |  RTO (s)
+--------|--------------|--------------|--------------|--------------|----------
+      1 |          292 |          388 |          178 |      1000000 | 1.000000
+      2 |          294 |          376 |          157 |      1000000 | 1.000000
+      3 |          333 |          370 |          128 |      1000000 | 1.000000
+      4 |          271 |          357 |          120 |      1000000 | 1.000000
+      5 |          335 |          354 |           95 |      1000000 | 1.000000
+      6 |          322 |          350 |           79 |      1000000 | 1.000000
+      7 |          173 |          327 |          103 |      1000000 | 1.000000
+      8 |          160 |          306 |          119 |      1000000 | 1.000000
+      9 |          160 |          287 |          125 |      1000000 | 1.000000
+     10 |          161 |          271 |          125 |      1000000 | 1.000000
+
+Closing connection...
+
+Final RTO Statistics:
+  Smoothed RTT: 271 us (0.271 ms)
+  RTT Variance: 125 us (0.125 ms)
+  Final RTO: 1000000 us (1.000 s)
+  Data packets TX: 10
+  Data packets RX (ACK): 10
+  Retransmissions: 0
+start_time: 2026-04-21_15:00:14 (1776780014.046099s)
+finish_time: 2026-04-21_15:00:14 (1776780014.049203s)
+(duration): 0.003104s
+sd: 3
+port: 24536
+local: 0.0.0.0 33624
+remote: 138.251.29.164 24536
+state: 0 (closed)
+seq_tx: 13
+seq_rx: 2
+rtt: 161 us
+rto: 1000000 us
+open_req_rx: 0
+open_req_dup_rx: 0
+open_reqack_rx: 1
+open_reqack_dup_rx: 0
+open_ack_rx: 0
+open_ack_dup_rx: 0
+open_req_tx: 1
+open_req_re_tx: 0
+open_reqack_tx: 0
+open_reqack_re_tx: 0
+open_ack_tx: 1
+open_ack_re_tx: 0
+data_req_rx: 0
+data_req_bytes_rx: 0
+data_ack_rx: 10
+data_req_dup_rx: 0
+data_req_bytes_dup_rx: 0
+data_ack_dup_rx: 0
+data_req_tx: 10
+data_req_bytes_tx: 12800
+data_ack_tx: 0
+data_req_re_tx: 0
+data_req_bytes_re_tx: 0
+data_ack_re_tx: 0
+close_req_rx: 0
+close_req_dup_rx: 0
+close_ack_rx: 1
+close_ack_dup_rx: 0
+close_req_tx: 1
+close_req_re_tx: 0
+close_ack_tx: 0
+close_ack_re_tx: 0
+data mean tx_rate: 32.99 Mbps - 32989690 bps

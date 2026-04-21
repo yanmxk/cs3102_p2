@@ -1,0 +1,98 @@
+Stress Test Client
+Connecting to pc8-002-l:24536
+Number of packets: 100, Payload size: 256 bytes
+
+Connection established
+
+Packet | Previous RTO | Current RTO  | RTO Change
+--------|--------------|--------------|----------
+      5 |      1000000 |      1000000 |          0
+     10 |      1000000 |      1000000 |          0
+     15 |      1000000 |      1000000 |          0
+     20 |      1000000 |      1000000 |          0
+     25 |      1000000 |      1000000 |          0
+     30 |      1000000 |      1000000 |          0
+     35 |      1000000 |      1000000 |          0
+     40 |      1000000 |      1000000 |          0
+     45 |      1000000 |      1000000 |          0
+     50 |      1000000 |      1000000 |          0
+     55 |      1000000 |      1000000 |          0
+     60 |      1000000 |      1000000 |          0
+     65 |      1000000 |      1000000 |          0
+     70 |      1000000 |      1000000 |          0
+     75 |      1000000 |      1000000 |          0
+     80 |      1000000 |      1000000 |          0
+     85 |      1000000 |      1000000 |          0
+     90 |      1000000 |      1000000 |          0
+     95 |      1000000 |      1000000 |          0
+    100 |      1000000 |      1000000 |          0
+
+Closing connection...
+Connection closed
+
+Stress Test Results:
+  Packets sent: 100
+  Packets ACK'd: 100
+  Retransmissions: 0
+  Success rate: 100.0%
+
+RTT Statistics:
+  Min RTT: 121 us
+  Max RTT: 497 us
+  Avg RTT: 151 us (0.151 ms)
+
+RTO Statistics:
+  Min RTO: 1000000 us (1000.000 ms)
+  Max RTO: 1000000 us (1.000 s)
+  Final RTO: 1000000 us (1.000 s)
+  RTO increases: 0
+  RTO decreases: 0
+
+Adaptive RTO Performance:
+  Smoothed RTT: 131 us (0.131 ms)
+  RTT Variance: 8 us (0.008 ms)
+start_time: 2026-04-21_15:00:27 (1776780027.248185s)
+finish_time: 2026-04-21_15:00:27 (1776780027.264116s)
+(duration): 0.015931s
+sd: 3
+port: 24536
+local: 0.0.0.0 58146
+remote: 138.251.29.164 24536
+state: 0 (closed)
+seq_tx: 103
+seq_rx: 2
+rtt: 141 us
+rto: 1000000 us
+open_req_rx: 0
+open_req_dup_rx: 0
+open_reqack_rx: 1
+open_reqack_dup_rx: 0
+open_ack_rx: 0
+open_ack_dup_rx: 0
+open_req_tx: 1
+open_req_re_tx: 0
+open_reqack_tx: 0
+open_reqack_re_tx: 0
+open_ack_tx: 1
+open_ack_re_tx: 0
+data_req_rx: 0
+data_req_bytes_rx: 0
+data_ack_rx: 100
+data_req_dup_rx: 0
+data_req_bytes_dup_rx: 0
+data_ack_dup_rx: 0
+data_req_tx: 100
+data_req_bytes_tx: 25600
+data_ack_tx: 0
+data_req_re_tx: 0
+data_req_bytes_re_tx: 0
+data_ack_re_tx: 0
+close_req_rx: 0
+close_req_dup_rx: 0
+close_ack_rx: 1
+close_ack_dup_rx: 0
+close_req_tx: 1
+close_req_re_tx: 0
+close_ack_tx: 0
+close_ack_re_tx: 0
+data mean tx_rate: 12.86 Mbps - 12855439 bps

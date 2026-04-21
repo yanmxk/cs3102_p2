@@ -1,0 +1,78 @@
+Stress Test Server
+Listening on port 24536
+
+start() OK
+Connection accepted
+
+Receiving packets...
+  Received 10 packets (2560 bytes), RTO: 1000000 us
+  Received 20 packets (5120 bytes), RTO: 1000000 us
+  Received 30 packets (7680 bytes), RTO: 1000000 us
+  Received 40 packets (10240 bytes), RTO: 1000000 us
+  Received 50 packets (12800 bytes), RTO: 1000000 us
+  Received 60 packets (15360 bytes), RTO: 1000000 us
+  Received 70 packets (17920 bytes), RTO: 1000000 us
+  Received 80 packets (20480 bytes), RTO: 1000000 us
+  Received 90 packets (23040 bytes), RTO: 1000000 us
+  Received 100 packets (25600 bytes), RTO: 1000000 us
+
+Connection closed
+
+Stress Test Results (Server View):
+  Total packets received: 100
+  Total bytes received: 25600
+  Average packet size: 256.0 bytes
+
+RTT Statistics (Server View):
+  Min RTT: 480 us
+  Max RTT: 480 us
+
+Final RTO Statistics (Server View):
+  Smoothed RTT: 480 us (0.480 ms)
+  RTT Variance: 240 us (0.240 ms)
+  RTO: 1000000 us (1.000 s)
+start_time: 2026-04-21_15:00:27 (1776780027.248462s)
+(now): 2026-04-21_15:00:27 (1776780027.264081s)
+(duration): 0.015619s
+sd: 3
+port: 24536
+local: 0.0.0.0 24536
+remote: 138.251.28.52 58146
+state: 5 (closing_i)
+seq_tx: 3
+seq_rx: 102
+rtt: 480 us
+rto: 1000000 us
+open_req_rx: 1
+open_req_dup_rx: 0
+open_reqack_rx: 0
+open_reqack_dup_rx: 0
+open_ack_rx: 1
+open_ack_dup_rx: 0
+open_req_tx: 0
+open_req_re_tx: 0
+open_reqack_tx: 1
+open_reqack_re_tx: 0
+open_ack_tx: 0
+open_ack_re_tx: 0
+data_req_rx: 100
+data_req_bytes_rx: 25600
+data_ack_rx: 0
+data_req_dup_rx: 0
+data_req_bytes_dup_rx: 0
+data_ack_dup_rx: 0
+data_req_tx: 0
+data_req_bytes_tx: 0
+data_ack_tx: 100
+data_req_re_tx: 0
+data_req_bytes_re_tx: 0
+data_ack_re_tx: 0
+close_req_rx: 1
+close_req_dup_rx: 0
+close_ack_rx: 0
+close_ack_dup_rx: 0
+close_req_tx: 0
+close_req_re_tx: 0
+close_ack_tx: 1
+close_ack_re_tx: 0
+data mean rx_rate: 13.11 Mbps - 13112235 bps

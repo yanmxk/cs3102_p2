@@ -1,0 +1,84 @@
+Large Transfer Test Client
+Connecting to pc8-002-l:24536
+Payload size: 1024 bytes, Total packets: 20
+
+Connection established
+
+Packet |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   |  RTO (s)
+--------|--------------|--------------|--------------|--------------|----------
+      1 |          480 |          669 |          315 |      1000000 |    1.000
+      2 |          657 |          667 |          239 |      1000000 |    1.000
+      3 |          666 |          666 |          179 |      1000000 |    1.000
+      4 |          524 |          648 |          169 |      1000000 |    1.000
+      5 |          550 |          635 |          151 |      1000000 |    1.000
+      6 |          346 |          598 |          185 |      1000000 |    1.000
+      7 |          241 |          553 |          228 |      1000000 |    1.000
+      8 |          249 |          515 |          247 |      1000000 |    1.000
+      9 |          253 |          482 |          250 |      1000000 |    1.000
+     10 |          268 |          455 |          241 |      1000000 |    1.000
+     11 |          248 |          429 |          232 |      1000000 |    1.000
+     12 |          244 |          405 |          220 |      1000000 |    1.000
+     13 |          250 |          385 |          203 |      1000000 |    1.000
+     14 |          258 |          369 |          184 |      1000000 |    1.000
+     15 |          218 |          350 |          175 |      1000000 |    1.000
+     16 |          270 |          340 |          151 |      1000000 |    1.000
+     17 |          282 |          332 |          127 |      1000000 |    1.000
+     18 |          272 |          324 |          110 |      1000000 |    1.000
+     19 |          147 |          301 |          126 |      1000000 |    1.000
+     20 |          204 |          288 |          118 |      1000000 |    1.000
+
+Closing connection...
+Connection closed
+
+Final RTO Statistics:
+  Smoothed RTT: 288 us (0.288 ms)
+  RTT Variance: 118 us (0.118 ms)
+  RTO: 1000000 us (1.000 s)
+  Data packets TX: 20
+  Data packets RX (ACK): 20
+  Retransmissions: 0
+start_time: 2026-04-21_15:00:18 (1776780018.423089s)
+finish_time: 2026-04-21_15:00:18 (1776780018.430781s)
+(duration): 0.007692s
+sd: 3
+port: 24536
+local: 0.0.0.0 57928
+remote: 138.251.29.164 24536
+state: 0 (closed)
+seq_tx: 23
+seq_rx: 2
+rtt: 204 us
+rto: 1000000 us
+open_req_rx: 0
+open_req_dup_rx: 0
+open_reqack_rx: 1
+open_reqack_dup_rx: 0
+open_ack_rx: 0
+open_ack_dup_rx: 0
+open_req_tx: 1
+open_req_re_tx: 0
+open_reqack_tx: 0
+open_reqack_re_tx: 0
+open_ack_tx: 1
+open_ack_re_tx: 0
+data_req_rx: 0
+data_req_bytes_rx: 0
+data_ack_rx: 20
+data_req_dup_rx: 0
+data_req_bytes_dup_rx: 0
+data_ack_dup_rx: 0
+data_req_tx: 20
+data_req_bytes_tx: 20480
+data_ack_tx: 0
+data_req_re_tx: 0
+data_req_bytes_re_tx: 0
+data_ack_re_tx: 0
+close_req_rx: 0
+close_req_dup_rx: 0
+close_ack_rx: 1
+close_ack_dup_rx: 0
+close_req_tx: 1
+close_req_re_tx: 0
+close_ack_tx: 0
+close_ack_re_tx: 0
+data mean tx_rate: 21.30 Mbps - 21300052 bps

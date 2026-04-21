@@ -1,0 +1,82 @@
+Large Transfer Test Server
+Listening on port 24536
+
+start() OK
+Connection accepted
+
+Packet |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   | Bytes RX
+--------|--------------|--------------|--------------|--------------|----------
+      1 |          668 |          668 |          334 |      1000000 |     1024
+      2 |          668 |          668 |          334 |      1000000 |     1024
+      3 |          668 |          668 |          334 |      1000000 |     1024
+      4 |          668 |          668 |          334 |      1000000 |     1024
+      5 |          668 |          668 |          334 |      1000000 |     1024
+      6 |          668 |          668 |          334 |      1000000 |     1024
+      7 |          668 |          668 |          334 |      1000000 |     1024
+      8 |          668 |          668 |          334 |      1000000 |     1024
+      9 |          668 |          668 |          334 |      1000000 |     1024
+     10 |          668 |          668 |          334 |      1000000 |     1024
+     11 |          668 |          668 |          334 |      1000000 |     1024
+     12 |          668 |          668 |          334 |      1000000 |     1024
+     13 |          668 |          668 |          334 |      1000000 |     1024
+     14 |          668 |          668 |          334 |      1000000 |     1024
+     15 |          668 |          668 |          334 |      1000000 |     1024
+     16 |          668 |          668 |          334 |      1000000 |     1024
+     17 |          668 |          668 |          334 |      1000000 |     1024
+     18 |          668 |          668 |          334 |      1000000 |     1024
+     19 |          668 |          668 |          334 |      1000000 |     1024
+     20 |          668 |          668 |          334 |      1000000 |     1024
+
+Connection closed
+Total packets received: 20
+Total bytes received: 20480
+
+Final RTO Statistics (Server View):
+  Smoothed RTT: 668 us (0.668 ms)
+  RTT Variance: 334 us (0.334 ms)
+  RTO: 1000000 us (1.000 s)
+start_time: 2026-04-21_15:00:18 (1776780018.423439s)
+(now): 2026-04-21_15:00:18 (1776780018.430620s)
+(duration): 0.007181s
+sd: 3
+port: 24536
+local: 0.0.0.0 24536
+remote: 138.251.28.52 57928
+state: 5 (closing_i)
+seq_tx: 3
+seq_rx: 22
+rtt: 668 us
+rto: 1000000 us
+open_req_rx: 1
+open_req_dup_rx: 0
+open_reqack_rx: 0
+open_reqack_dup_rx: 0
+open_ack_rx: 1
+open_ack_dup_rx: 0
+open_req_tx: 0
+open_req_re_tx: 0
+open_reqack_tx: 1
+open_reqack_re_tx: 0
+open_ack_tx: 0
+open_ack_re_tx: 0
+data_req_rx: 20
+data_req_bytes_rx: 20480
+data_ack_rx: 0
+data_req_dup_rx: 0
+data_req_bytes_dup_rx: 0
+data_ack_dup_rx: 0
+data_req_tx: 0
+data_req_bytes_tx: 0
+data_ack_tx: 20
+data_req_re_tx: 0
+data_req_bytes_re_tx: 0
+data_ack_re_tx: 0
+close_req_rx: 1
+close_req_dup_rx: 0
+close_ack_rx: 0
+close_ack_dup_rx: 0
+close_req_tx: 0
+close_req_re_tx: 0
+close_ack_tx: 1
+close_ack_re_tx: 0
+data mean rx_rate: 22.82 Mbps - 22815763 bps

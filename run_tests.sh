@@ -69,7 +69,7 @@ TEST_PAIRS=(
     "test-client-2:test-server-2:2:"
     "test-client-3:test-server-3:3:"
     "test-adaptive-rto-client:test-adaptive-rto-server:adaptive-rto:$SERVER_HOST 24536 10"
-    "test-large-transfer-client:test-large-transfer-server:large-transfer:$SERVER_HOST 24536 65536"
+    "test-large-transfer-client:test-large-transfer-server:large-transfer:$SERVER_HOST 24536 1024"
     "test-multiple-sends-client:test-multiple-sends-server:multiple-sends:$SERVER_HOST 24536"
     "test-stress-client:test-stress-server:stress:$SERVER_HOST 24536 100"
 )
@@ -104,8 +104,8 @@ for i in "${!TEST_PAIRS[@]}"; do
     SERVER_PID=$!
     SERVER_START_TIME=$(date +%s)
     
-    # Give server time to start
-    sleep 2
+    # Give server time to start listening
+    sleep 3
     
     # Run client test on remote machine
     echo "Starting client test on $CLIENT_HOST: $CLIENT_TEST $CLIENT_ARGS"

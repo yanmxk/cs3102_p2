@@ -26,14 +26,12 @@ echo "Log directory: $DROP_TEST_DIR"
 # Compile drop if needed
 if [ ! -f "$STARTERCODE_DIR/drop" ]; then
     echo -e "${BLUE}Compiling drop...${NC}"
-    cd "$STARTERCODE_DIR" || exit 1
-    clang -o drop drop.c
+    clang -o "$STARTERCODE_DIR/drop" drop.c
     if [ $? -ne 0 ]; then
         echo -e "${RED}✗ Compilation failed${NC}"
         exit 1
     fi
     echo -e "${GREEN}✓ Compilation successful${NC}"
-    cd .. || exit 1
 fi
 
 # Test configurations: (drop_percentage, packet_count, label)

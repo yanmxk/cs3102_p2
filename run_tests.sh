@@ -23,6 +23,7 @@ mkdir -p "$LOG_DIR"
 echo -e "${BLUE}================================================${NC}"
 echo -e "${BLUE}LRTP Test Runner${NC}"
 echo -e "${BLUE}================================================${NC}"
+echo -e "${BLUE}Server: $(hostname)${NC}"
 echo ""
 
 # Prompt for client hostname
@@ -39,7 +40,7 @@ if ! ping -c 1 -W 2 "$CLIENT_HOST" &> /dev/null; then
     echo -e "${RED}Error: Cannot reach $CLIENT_HOST${NC}"
     exit 1
 fi
-echo -e "${GREEN}Connection successful!${NC}"
+echo -e "${GREEN}✓ Connection validated${NC}"
 echo ""
 
 # Change to startercode directory
@@ -79,8 +80,9 @@ SUMMARY_FILE="$LOG_DIR/test_summary.txt"
 echo "LRTP Test Run Summary" > "$SUMMARY_FILE"
 echo "=====================" >> "$SUMMARY_FILE"
 echo "Start Time: $(date)" >> "$SUMMARY_FILE"
+echo "Server Host: $SERVER_HOST" >> "$SUMMARY_FILE"
 echo "Client Host: $CLIENT_HOST" >> "$SUMMARY_FILE"
-echo "Server Host: localhost" >> "$SUMMARY_FILE"
+echo "Network: $SERVER_HOST ↔ $CLIENT_HOST" >> "$SUMMARY_FILE"
 echo "" >> "$SUMMARY_FILE"
 
 PASSED=0
@@ -92,7 +94,8 @@ for i in "${!TEST_PAIRS[@]}"; do
     IFS=':' read -r CLIENT_TEST SERVER_TEST TEST_NAME CLIENT_ARGS <<< "${TEST_PAIRS[$i]}"
     
     TEST_NUM=$((i + 1))
-    echo -e "${BLUE}[Test $TEST_NUM/$TOTAL] Running: $TEST_NAME${NC}"
+    echo -e "${BLUE}[Test $TEST_NUM/$TOTAL] $TEST_NAME${NC}"
+    echo -e "${BLUE}  Network: $SERVER_HOST (server) ↔ $CLIENT_HOST (client)${NC}"
     
     # Log files for this test
     CLIENT_LOG="$LOG_DIR/${TEST_NAME}_client.log"
@@ -153,6 +156,7 @@ done
 echo -e "${BLUE}================================================${NC}"
 echo -e "${BLUE}Test Run Complete${NC}"
 echo -e "${BLUE}================================================${NC}"
+echo -e "${BLUE}Network: $SERVER_HOST ↔ $CLIENT_HOST${NC}"
 echo ""
 echo -e "Total Tests: ${TOTAL}"
 echo -e "Passed: ${GREEN}${PASSED}${NC}"

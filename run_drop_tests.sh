@@ -8,6 +8,7 @@ set -o pipefail
 
 STARTERCODE_DIR="./startercode"
 DROP_TEST_DIR="drop_logs_$(date +%Y%m%d_%H%M%S)"
+LOCAL_HOST=$(hostname)
 
 # Color codes for output
 GREEN='\033[0;32m'
@@ -18,6 +19,7 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}Drop Simulator Test Suite${NC}"
 echo -e "${BLUE}========================================${NC}"
+echo -e "Host: ${BLUE}$LOCAL_HOST${NC}"
 
 # Create log directory
 mkdir -p "$DROP_TEST_DIR"
@@ -49,9 +51,11 @@ TEST_CONFIGS=(
 
 # Create summary file
 SUMMARY_FILE="$DROP_TEST_DIR/drop_summary.txt"
-cat > "$SUMMARY_FILE" << 'EOF'
+cat > "$SUMMARY_FILE" << EOF
 Drop Simulator Test Results
 ===========================
+Hostname: $LOCAL_HOST
+Date: $(date '+%Y-%m-%d %H:%M:%S')
 
 This file contains the summary of drop simulator tests.
 Each test runs the drop program to simulate packet loss with various parameters.

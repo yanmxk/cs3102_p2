@@ -6,30 +6,30 @@ Connection accepted
 
 Payload  |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   | Bytes RX
 ---------|--------------|--------------|--------------|--------------|----------
-      1 |          491 |          491 |          245 |      1000000 |        5
-      2 |          491 |          491 |          245 |      1000000 |       31
-      3 |          491 |          491 |          245 |      1000000 |       92
-      4 |          491 |          491 |          245 |      1000000 |        8
-      5 |          491 |          491 |          245 |      1000000 |        0
+      1 |          683 |          683 |          341 |      1000000 |        5
+      2 |          683 |          683 |          341 |      1000000 |       31
+      3 |          683 |          683 |          341 |      1000000 |       92
+      4 |          683 |          683 |          341 |      1000000 |        8
+      5 |          683 |          683 |          341 |      1000000 |        0
 
 Connection closed
 Total payloads received: 5
 
 Final RTO Statistics (Server View):
-  Smoothed RTT: 491 us (0.491 ms)
-  RTT Variance: 245 us (0.245 ms)
+  Smoothed RTT: 683 us (0.683 ms)
+  RTT Variance: 341 us (0.341 ms)
   RTO: 1000000 us (1.000 s)
-start_time: 2026-04-21_15:00:22 (1776780022.848923s)
-(now): 2026-04-21_15:00:22 (1776780022.851580s)
-(duration): 0.002657s
+start_time: 2026-04-21_19:53:27 (1776797607.759593s)
+(now): 2026-04-21_19:53:27 (1776797607.762674s)
+(duration): 0.003081s
 sd: 3
 port: 24536
 local: 0.0.0.0 24536
-remote: 138.251.28.52 55425
+remote: 138.251.28.52 56306
 state: 5 (closing_i)
 seq_tx: 3
 seq_rx: 7
-rtt: 491 us
+rtt: 683 us
 rto: 1000000 us
 open_req_rx: 1
 open_req_dup_rx: 0
@@ -63,4 +63,4 @@ close_req_tx: 0
 close_req_re_tx: 0
 close_ack_tx: 1
 close_ack_re_tx: 0
-data mean rx_rate: 409.48 Kbps - 409484 bps
+data mean rx_rate: 353.13 Kbps - 353132 bps

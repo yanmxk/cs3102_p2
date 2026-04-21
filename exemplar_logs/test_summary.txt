@@ -1,30 +1,31 @@
 LRTP Test Run Summary
 =====================
-Start Time: Tue 21 Apr 14:59:46 BST 2026
+Start Time: Tue 21 Apr 19:51:50 BST 2026
+Server Host: pc8-002-l
 Client Host: pc2-002-l
-Server Host: localhost
+Network: pc8-002-l ↔ pc2-002-l
 
-Test 1: 0 - PASSED (5s)
+Test 1: 0 - PASSED (4s)
   Client Log: 0_client.log
   Server Log: 0_server.log
 
-Test 2: 1 - PASSED (5s)
+Test 2: 1 - PASSED (24s)
   Client Log: 1_client.log
   Server Log: 1_server.log
 
-Test 3: 2 - PASSED (5s)
+Test 3: 2 - PASSED (23s)
   Client Log: 2_client.log
   Server Log: 2_server.log
 
-Test 4: 3 - PASSED (5s)
+Test 4: 3 - PASSED (30s)
   Client Log: 3_client.log
   Server Log: 3_server.log
 
-Test 5: adaptive-rto - PASSED (4s)
+Test 5: adaptive-rto - PASSED (3s)
   Client Log: adaptive-rto_client.log
   Server Log: adaptive-rto_server.log
 
-Test 6: large-transfer - PASSED (3s)
+Test 6: large-transfer - PASSED (4s)
   Client Log: large-transfer_client.log
   Server Log: large-transfer_server.log
 
@@ -41,4 +42,4 @@ Final Results
 Total Tests: 8
 Passed: 8
 Failed: 0
-End Time: Tue 21 Apr 15:00:28 BST 2026
+End Time: Tue 21 Apr 19:53:33 BST 2026

@@ -4,33 +4,33 @@ Connection established
 
 Payload  |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   | Label
 ---------|--------------|--------------|--------------|--------------|-------------------
-      1 |          486 |          522 |          208 |      1000000 | Small (5)
-      2 |          524 |          522 |          156 |      1000000 | Medium (31)
-      3 |          481 |          516 |          127 |      1000000 | Large (92)
-      4 |          516 |          516 |           95 |      1000000 | Binary (8)
-      5 |          249 |          482 |          138 |      1000000 | Empty (0)
+      1 |          638 |          694 |          279 |      1000000 | Small (5)
+      2 |          550 |          676 |          245 |      1000000 | Medium (31)
+      3 |          637 |          671 |          193 |      1000000 | Large (92)
+      4 |          365 |          632 |          221 |      1000000 | Binary (8)
+      5 |          349 |          596 |          236 |      1000000 | Empty (0)
 
 Closing connection...
 Connection closed
 
 Final RTO Statistics:
-  Smoothed RTT: 482 us (0.482 ms)
-  RTT Variance: 138 us (0.138 ms)
+  Smoothed RTT: 596 us (0.596 ms)
+  RTT Variance: 236 us (0.236 ms)
   RTO: 1000000 us (1.000 s)
   Data packets TX: 5
   Data packets RX (ACK): 5
   Retransmissions: 0
-start_time: 2026-04-21_15:00:22 (1776780022.848651s)
-finish_time: 2026-04-21_15:00:22 (1776780022.851678s)
-(duration): 0.003027s
+start_time: 2026-04-21_19:53:27 (1776797607.759385s)
+finish_time: 2026-04-21_19:53:27 (1776797607.762943s)
+(duration): 0.003558s
 sd: 3
 port: 24536
-local: 0.0.0.0 55425
+local: 0.0.0.0 56306
 remote: 138.251.29.164 24536
 state: 0 (closed)
 seq_tx: 8
 seq_rx: 2
-rtt: 249 us
+rtt: 349 us
 rto: 1000000 us
 open_req_rx: 0
 open_req_dup_rx: 0
@@ -64,4 +64,4 @@ close_req_tx: 1
 close_req_re_tx: 0
 close_ack_tx: 0
 close_ack_re_tx: 0
-data mean tx_rate: 359.43 Kbps - 359431 bps
+data mean tx_rate: 305.79 Kbps - 305789 bps

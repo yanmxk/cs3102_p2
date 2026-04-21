@@ -38,8 +38,8 @@ Stress Test Results:
 
 RTT Statistics:
   Min RTT: 121 us
-  Max RTT: 497 us
-  Avg RTT: 151 us (0.151 ms)
+  Max RTT: 603 us
+  Avg RTT: 190 us (0.190 ms)
 
 RTO Statistics:
   Min RTO: 1000000 us (1000.000 ms)
@@ -49,19 +49,19 @@ RTO Statistics:
   RTO decreases: 0
 
 Adaptive RTO Performance:
-  Smoothed RTT: 131 us (0.131 ms)
-  RTT Variance: 8 us (0.008 ms)
-start_time: 2026-04-21_15:00:27 (1776780027.248185s)
-finish_time: 2026-04-21_15:00:27 (1776780027.264116s)
-(duration): 0.015931s
+  Smoothed RTT: 180 us (0.180 ms)
+  RTT Variance: 62 us (0.062 ms)
+start_time: 2026-04-21_19:53:32 (1776797612.180300s)
+finish_time: 2026-04-21_19:53:32 (1776797612.200470s)
+(duration): 0.020170s
 sd: 3
 port: 24536
-local: 0.0.0.0 58146
+local: 0.0.0.0 37884
 remote: 138.251.29.164 24536
 state: 0 (closed)
 seq_tx: 103
 seq_rx: 2
-rtt: 141 us
+rtt: 136 us
 rto: 1000000 us
 open_req_rx: 0
 open_req_dup_rx: 0
@@ -95,4 +95,4 @@ close_req_tx: 1
 close_req_re_tx: 0
 close_ack_tx: 0
 close_ack_re_tx: 0
-data mean tx_rate: 12.86 Mbps - 12855439 bps
+data mean tx_rate: 10.15 Mbps - 10153693 bps

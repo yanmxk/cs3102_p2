@@ -30,12 +30,13 @@ import numpy as np
 class DistributedTestConfig:
     """Configuration for distributed testing"""
     def __init__(self, mode='local', server_host='127.0.0.1', server_port=None, 
-                 results_file=None, workspace_path="/Users/yanmx/Desktop/cs3102_p2"):
+                 results_file=None, workspace_path=None):
         self.mode = mode  # 'local', 'server', 'client', 'analyzer'
         self.server_host = server_host
         self.server_port = server_port
         self.results_file = results_file
-        self.workspace_path = workspace_path
+        # Use current directory if workspace not specified
+        self.workspace_path = workspace_path or os.getcwd()
 
 @dataclass
 class RTTMetrics:
@@ -72,8 +73,11 @@ class TestResult:
             self.packet_metrics = []
 
 class LRTPTestAnalyzer:
-    def __init__(self, workspace_path: str = "/Users/yanmx/Desktop/cs3102_p2", 
+    def __init__(self, workspace_path: str = None, 
                  config: DistributedTestConfig = None):
+        # Use current directory if workspace not specified
+        if workspace_path is None:
+            workspace_path = os.getcwd()
         self.workspace = workspace_path
         self.startercode = os.path.join(workspace_path, "startercode")
         self.results: List[TestResult] = []
@@ -1231,24 +1235,27 @@ Examples:
                        help='Comma-separated list of server ports for client mode')
     parser.add_argument('--results-file', default='test_results.json',
                        help='Results file for saving/loading (default: test_results.json)')
-    parser.add_argument('--workspace', default='/Users/yanmx/Desktop/cs3102_p2',
-                       help='Workspace path (default: /Users/yanmx/Desktop/cs3102_p2)')
+    parser.add_argument('--workspace', default=None,
+                       help='Workspace path (default: current directory)')
     parser.add_argument('--visualize', action='store_true',
                        help='Generate visualizations (for local and analyzer modes)')
     
     args = parser.parse_args()
+    
+    # Use current directory if workspace not specified
+    workspace_path = args.workspace or os.getcwd()
     
     # Create configuration
     config = DistributedTestConfig(
         mode=args.mode,
         server_host=args.server_host,
         server_port=args.server_port,
-        results_file=os.path.join(args.workspace, args.results_file),
-        workspace_path=args.workspace
+        results_file=os.path.join(workspace_path, args.results_file),
+        workspace_path=workspace_path
     )
     
     # Create analyzer
-    analyzer = LRTPTestAnalyzer(workspace_path=args.workspace, config=config)
+    analyzer = LRTPTestAnalyzer(workspace_path=workspace_path, config=config)
     
     print("[*] Starting LRTP Test Analysis...")
     print(f"[*] Mode: {args.mode}")
@@ -1281,7 +1288,7 @@ Examples:
             analyzer.generate_all_visualizations()
         
         # Save JSON data
-        json_file = os.path.join(args.workspace, "test_analysis_data.json")
+        json_file = os.path.join(workspace_path, "test_analysis_data.json")
         with open(json_file, 'w') as f:
             json.dump(analysis, f, indent=2, default=str)
         print(f"[+] JSON data saved to: {json_file}")
@@ -1320,7 +1327,7 @@ Examples:
             analyzer.generate_all_visualizations()
         
         # Save JSON data
-        json_file = os.path.join(args.workspace, "test_analysis_data.json")
+        json_file = os.path.join(workspace_path, "test_analysis_data.json")
         with open(json_file, 'w') as f:
             json.dump(analysis, f, indent=2, default=str)
         print(f"[+] JSON data saved to: {json_file}")

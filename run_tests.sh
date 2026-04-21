@@ -59,16 +59,19 @@ fi
 echo -e "${GREEN}Build successful!${NC}"
 echo ""
 
-# Define test pairs
+# Get server hostname (this machine)
+SERVER_HOST=$(hostname)
+
+# Define test pairs with format: client:server:testname:client_args
 TEST_PAIRS=(
-    "test-client-0:test-server-0:0"
-    "test-client-1:test-server-1:1"
-    "test-client-2:test-server-2:2"
-    "test-client-3:test-server-3:3"
-    "test-adaptive-rto-client:test-adaptive-rto-server:adaptive-rto"
-    "test-large-transfer-client:test-large-transfer-server:large-transfer"
-    "test-multiple-sends-client:test-multiple-sends-server:multiple-sends"
-    "test-stress-client:test-stress-server:stress"
+    "test-client-0:test-server-0:0:"
+    "test-client-1:test-server-1:1:"
+    "test-client-2:test-server-2:2:"
+    "test-client-3:test-server-3:3:"
+    "test-adaptive-rto-client:test-adaptive-rto-server:adaptive-rto:$SERVER_HOST 24536 10"
+    "test-large-transfer-client:test-large-transfer-server:large-transfer:$SERVER_HOST 24536 65536"
+    "test-multiple-sends-client:test-multiple-sends-server:multiple-sends:$SERVER_HOST 24536"
+    "test-stress-client:test-stress-server:stress:$SERVER_HOST 24536 100"
 )
 
 # Summary file
@@ -86,7 +89,7 @@ TOTAL=${#TEST_PAIRS[@]}
 
 # Run each test pair
 for i in "${!TEST_PAIRS[@]}"; do
-    IFS=':' read -r CLIENT_TEST SERVER_TEST TEST_NAME <<< "${TEST_PAIRS[$i]}"
+    IFS=':' read -r CLIENT_TEST SERVER_TEST TEST_NAME CLIENT_ARGS <<< "${TEST_PAIRS[$i]}"
     
     TEST_NUM=$((i + 1))
     echo -e "${BLUE}[Test $TEST_NUM/$TOTAL] Running: $TEST_NAME${NC}"
@@ -105,9 +108,9 @@ for i in "${!TEST_PAIRS[@]}"; do
     sleep 2
     
     # Run client test on remote machine
-    echo "Starting client test on $CLIENT_HOST: $CLIENT_TEST"
+    echo "Starting client test on $CLIENT_HOST: $CLIENT_TEST $CLIENT_ARGS"
     CLIENT_EXIT=0
-    ssh "$CLIENT_HOST" "cd $STARTERCODE_DIR && ./$CLIENT_TEST" > "$CLIENT_LOG" 2>&1 || CLIENT_EXIT=$?
+    ssh "$CLIENT_HOST" "cd $STARTERCODE_DIR && ./$CLIENT_TEST $CLIENT_ARGS" > "$CLIENT_LOG" 2>&1 || CLIENT_EXIT=$?
     
     # Wait for server to finish
     SERVER_EXIT=0

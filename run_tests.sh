@@ -26,6 +26,9 @@ echo -e "${BLUE}================================================${NC}"
 echo -e "${BLUE}LRTP Test Runner${NC}"
 echo -e "${BLUE}================================================${NC}"
 echo ""
+echo -e "${YELLOW}Note: Each test has a 120-second timeout${NC}"
+echo -e "${YELLOW}Modify TEST_TIMEOUT variable if needed${NC}"
+echo ""
 
 # Prompt for client hostname
 read -p "Enter the client hostname to connect to: " CLIENT_HOST
@@ -85,6 +88,9 @@ PASSED=0
 FAILED=0
 TOTAL=${#TEST_PAIRS[@]}
 
+# Test timeout in seconds (adaptive-rto and stress tests may need more time)
+TEST_TIMEOUT=120
+
 # Run each test pair
 for i in "${!TEST_PAIRS[@]}"; do
     IFS=':' read -r CLIENT_TEST SERVER_TEST TEST_NAME <<< "${TEST_PAIRS[$i]}"
@@ -105,17 +111,30 @@ for i in "${!TEST_PAIRS[@]}"; do
     # Give server time to start
     sleep 2
     
-    # Run client test on remote machine
+    # Run client test on remote machine with timeout
     echo "Starting client test on $CLIENT_HOST: $CLIENT_TEST"
-    if ssh "$CLIENT_HOST" "cd $STARTERCODE_DIR && ./$CLIENT_TEST" > "$CLIENT_LOG" 2>&1; then
+    if timeout $TEST_TIMEOUT ssh "$CLIENT_HOST" "cd $STARTERCODE_DIR && ./$CLIENT_TEST" > "$CLIENT_LOG" 2>&1; then
         CLIENT_EXIT=0
     else
         CLIENT_EXIT=$?
     fi
     
-    # Wait for server to finish
-    wait $SERVER_PID 2>/dev/null
+    # Wait for server to finish (with timeout)
+    timeout $TEST_TIMEOUT wait $SERVER_PID 2>/dev/null
     SERVER_EXIT=$?
+    
+    # Check if wait was killed by timeout
+    if [ $SERVER_EXIT -eq 124 ]; then
+        echo -e "${YELLOW}Warning: Server test timeout, killing process${NC}"
+        kill -9 $SERVER_PID 2>/dev/null || true
+        SERVER_EXIT=124
+    fi
+    
+    # Check if client was killed by timeout
+    if [ $CLIENT_EXIT -eq 124 ]; then
+        echo -e "${YELLOW}Warning: Client test timeout${NC}"
+    fi
+    
     SERVER_END_TIME=$(date +%s)
     
     # Check results
@@ -128,10 +147,18 @@ for i in "${!TEST_PAIRS[@]}"; do
         FAILED=$((FAILED + 1))
         RESULT="FAILED"
         if [ $CLIENT_EXIT -ne 0 ]; then
-            echo -e "${RED}  Client exit code: $CLIENT_EXIT${NC}"
+            if [ $CLIENT_EXIT -eq 124 ]; then
+                echo -e "${RED}  Client TIMEOUT (${TEST_TIMEOUT}s)${NC}"
+            else
+                echo -e "${RED}  Client exit code: $CLIENT_EXIT${NC}"
+            fi
         fi
         if [ $SERVER_EXIT -ne 0 ]; then
-            echo -e "${RED}  Server exit code: $SERVER_EXIT${NC}"
+            if [ $SERVER_EXIT -eq 124 ]; then
+                echo -e "${RED}  Server TIMEOUT (${TEST_TIMEOUT}s)${NC}"
+            else
+                echo -e "${RED}  Server exit code: $SERVER_EXIT${NC}"
+            fi
         fi
     fi
     

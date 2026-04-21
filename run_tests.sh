@@ -65,10 +65,10 @@ SERVER_HOST=$(hostname)
 
 # Define test pairs with format: client:server:testname:client_args
 TEST_PAIRS=(
-    "test-client-0:test-server-0:0:"
-    "test-client-1:test-server-1:1:"
-    "test-client-2:test-server-2:2:"
-    "test-client-3:test-server-3:3:"
+    "test-client-0:test-server-0:0:$SERVER_HOST 24536"
+    "test-client-1:test-server-1:1:$SERVER_HOST 24536"
+    "test-client-2:test-server-2:2:$SERVER_HOST 24536"
+    "test-client-3:test-server-3:3:$SERVER_HOST 24536"
     "test-adaptive-rto-client:test-adaptive-rto-server:adaptive-rto:$SERVER_HOST 24536 10"
     "test-large-transfer-client:test-large-transfer-server:large-transfer:$SERVER_HOST 24536 1024"
     "test-multiple-sends-client:test-multiple-sends-server:multiple-sends:$SERVER_HOST 24536"

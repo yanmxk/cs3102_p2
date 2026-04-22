@@ -1,5 +1,5 @@
 Adaptive RTO Test Client
-Connect to pc8-002-l:24536
+Connect to pc1-036-l:24536
 Sending 10 packets of 1280 bytes each
 
 Connection established (adaptive RTO initialized)
@@ -7,37 +7,37 @@ Initial RTO: 1000000 us (1.000 s)
 
 Packet |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   |  RTO (s)
 --------|--------------|--------------|--------------|--------------|----------
-      1 |          307 |          439 |          209 |      1000000 | 1.000000
-      2 |          382 |          431 |          171 |      1000000 | 1.000000
-      3 |          409 |          428 |          133 |      1000000 | 1.000000
-      4 |          267 |          407 |          140 |      1000000 | 1.000000
-      5 |          159 |          376 |          167 |      1000000 | 1.000000
-      6 |          173 |          350 |          176 |      1000000 | 1.000000
-      7 |          157 |          325 |          180 |      1000000 | 1.000000
-      8 |          184 |          307 |          170 |      1000000 | 1.000000
-      9 |          153 |          287 |          166 |      1000000 | 1.000000
-     10 |          158 |          270 |          156 |      1000000 | 1.000000
+      1 |          727 |          781 |          311 |      1000000 | 1.000000
+      2 |          790 |          782 |          235 |      1000000 | 1.000000
+      3 |          708 |          772 |          194 |      1000000 | 1.000000
+      4 |          658 |          757 |          174 |      1000000 | 1.000000
+      5 |          668 |          745 |          152 |      1000000 | 1.000000
+      6 |          661 |          734 |          135 |      1000000 | 1.000000
+      7 |          638 |          722 |          125 |      1000000 | 1.000000
+      8 |          669 |          715 |          107 |      1000000 | 1.000000
+      9 |          610 |          701 |          106 |      1000000 | 1.000000
+     10 |          523 |          678 |          124 |      1000000 | 1.000000
 
 Closing connection...
 
 Final RTO Statistics:
-  Smoothed RTT: 270 us (0.270 ms)
-  RTT Variance: 156 us (0.156 ms)
+  Smoothed RTT: 678 us (0.678 ms)
+  RTT Variance: 124 us (0.124 ms)
   Final RTO: 1000000 us (1.000 s)
   Data packets TX: 10
   Data packets RX (ACK): 10
   Retransmissions: 0
-start_time: 2026-04-21_19:53:18 (1776797598.948309s)
-finish_time: 2026-04-21_19:53:18 (1776797598.951274s)
-(duration): 0.002965s
+start_time: 2026-04-22_15:00:09 (1776866409.900589s)
+finish_time: 2026-04-22_15:00:09 (1776866409.908468s)
+(duration): 0.007879s
 sd: 3
 port: 24536
-local: 0.0.0.0 35462
-remote: 138.251.29.164 24536
+local: 0.0.0.0 40391
+remote: 138.251.30.89 24536
 state: 0 (closed)
 seq_tx: 13
 seq_rx: 2
-rtt: 158 us
+rtt: 523 us
 rto: 1000000 us
 open_req_rx: 0
 open_req_dup_rx: 0
@@ -71,4 +71,4 @@ close_req_tx: 1
 close_req_re_tx: 0
 close_ack_tx: 0
 close_ack_re_tx: 0
-data mean tx_rate: 34.54 Mbps - 34536256 bps
+data mean tx_rate: 13.00 Mbps - 12996573 bps

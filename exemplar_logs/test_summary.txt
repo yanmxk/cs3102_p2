@@ -1,23 +1,23 @@
 LRTP Test Run Summary
 =====================
-Start Time: Tue 21 Apr 19:51:50 BST 2026
-Server Host: pc8-002-l
+Start Time: Wed 22 Apr 14:56:49 BST 2026
+Server Host: pc1-036-l
 Client Host: pc2-002-l
-Network: pc8-002-l ↔ pc2-002-l
+Network: pc1-036-l ↔ pc2-002-l
 
 Test 1: 0 - PASSED (4s)
   Client Log: 0_client.log
   Server Log: 0_server.log
 
-Test 2: 1 - PASSED (24s)
+Test 2: 1 - PASSED (62s)
   Client Log: 1_client.log
   Server Log: 1_server.log
 
-Test 3: 2 - PASSED (23s)
+Test 3: 2 - PASSED (62s)
   Client Log: 2_client.log
   Server Log: 2_server.log
 
-Test 4: 3 - PASSED (30s)
+Test 4: 3 - PASSED (65s)
   Client Log: 3_client.log
   Server Log: 3_server.log
 
@@ -42,4 +42,4 @@ Final Results
 Total Tests: 8
 Passed: 8
 Failed: 0
-End Time: Tue 21 Apr 19:53:33 BST 2026
+End Time: Wed 22 Apr 15:00:24 BST 2026

@@ -1,36 +1,36 @@
 Multiple Sends Test Client
-Connecting to pc8-002-l:24536
+Connecting to pc1-036-l:24536
 Connection established
 
 Payload  |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   | Label
 ---------|--------------|--------------|--------------|--------------|-------------------
-      1 |          638 |          694 |          279 |      1000000 | Small (5)
-      2 |          550 |          676 |          245 |      1000000 | Medium (31)
-      3 |          637 |          671 |          193 |      1000000 | Large (92)
-      4 |          365 |          632 |          221 |      1000000 | Binary (8)
-      5 |          349 |          596 |          236 |      1000000 | Empty (0)
+      1 |          664 |          698 |          273 |      1000000 | Small (5)
+      2 |          600 |          685 |          229 |      1000000 | Medium (31)
+      3 |          645 |          680 |          181 |      1000000 | Large (92)
+      4 |          520 |          660 |          175 |      1000000 | Binary (8)
+      5 |          402 |          627 |          195 |      1000000 | Empty (0)
 
 Closing connection...
 Connection closed
 
 Final RTO Statistics:
-  Smoothed RTT: 596 us (0.596 ms)
-  RTT Variance: 236 us (0.236 ms)
+  Smoothed RTT: 627 us (0.627 ms)
+  RTT Variance: 195 us (0.195 ms)
   RTO: 1000000 us (1.000 s)
   Data packets TX: 5
   Data packets RX (ACK): 5
   Retransmissions: 0
-start_time: 2026-04-21_19:53:27 (1776797607.759385s)
-finish_time: 2026-04-21_19:53:27 (1776797607.762943s)
-(duration): 0.003558s
+start_time: 2026-04-22_15:00:18 (1776866418.733284s)
+finish_time: 2026-04-22_15:00:18 (1776866418.737257s)
+(duration): 0.003973s
 sd: 3
 port: 24536
-local: 0.0.0.0 56306
-remote: 138.251.29.164 24536
+local: 0.0.0.0 34801
+remote: 138.251.30.89 24536
 state: 0 (closed)
 seq_tx: 8
 seq_rx: 2
-rtt: 349 us
+rtt: 402 us
 rto: 1000000 us
 open_req_rx: 0
 open_req_dup_rx: 0
@@ -64,4 +64,4 @@ close_req_tx: 1
 close_req_re_tx: 0
 close_ack_tx: 0
 close_ack_re_tx: 0
-data mean tx_rate: 305.79 Kbps - 305789 bps
+data mean tx_rate: 273.85 Kbps - 273848 bps

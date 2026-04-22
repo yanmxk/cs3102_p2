@@ -24,24 +24,24 @@ Stress Test Results (Server View):
   Average packet size: 256.0 bytes
 
 RTT Statistics (Server View):
-  Min RTT: 480 us
-  Max RTT: 480 us
+  Min RTT: 848 us
+  Max RTT: 848 us
 
 Final RTO Statistics (Server View):
-  Smoothed RTT: 480 us (0.480 ms)
-  RTT Variance: 240 us (0.240 ms)
+  Smoothed RTT: 848 us (0.848 ms)
+  RTT Variance: 424 us (0.424 ms)
   RTO: 1000000 us (1.000 s)
-start_time: 2026-04-21_15:00:27 (1776780027.248462s)
-(now): 2026-04-21_15:00:27 (1776780027.264081s)
-(duration): 0.015619s
+start_time: 2026-04-22_15:00:23 (1776866423.155760s)
+(now): 2026-04-22_15:00:23 (1776866423.209062s)
+(duration): 0.053302s
 sd: 3
 port: 24536
 local: 0.0.0.0 24536
-remote: 138.251.28.52 58146
+remote: 138.251.28.52 54387
 state: 5 (closing_i)
 seq_tx: 3
 seq_rx: 102
-rtt: 480 us
+rtt: 848 us
 rto: 1000000 us
 open_req_rx: 1
 open_req_dup_rx: 0
@@ -75,4 +75,4 @@ close_req_tx: 0
 close_req_re_tx: 0
 close_ack_tx: 1
 close_ack_re_tx: 0
-data mean rx_rate: 13.11 Mbps - 13112235 bps
+data mean rx_rate: 3.84 Mbps - 3842257 bps

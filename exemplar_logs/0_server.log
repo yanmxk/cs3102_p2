@@ -1,19 +1,19 @@
 test-server-0
 start() OK
-accept() : connected to 138.251.28.52:40141
+accept() : connected to 138.251.28.52:58615
 lrtp_rx() : 1280 bytes (correct), v1=3211776 (correct), v2=3211776 (correct).
 lrtp_tx() : 1280/1280 bytes sent
-start_time: 2026-04-21_19:51:54 (1776797514.209501s)
-finish_time: 2026-04-21_19:51:54 (1776797514.211525s)
-(duration): 0.002024s
+start_time: 2026-04-22_14:56:53 (1776866213.227437s)
+finish_time: 2026-04-22_14:56:53 (1776866213.230184s)
+(duration): 0.002747s
 sd: 3
 port: 24536
 local: 0.0.0.0 24536
-remote: 138.251.28.52 40141
+remote: 138.251.28.52 58615
 state: 5 (closing_i)
 seq_tx: 7
 seq_rx: 3
-rtt: 492 us
+rtt: 705 us
 rto: 1000000 us
 open_req_rx: 1
 open_req_dup_rx: 0
@@ -47,5 +47,5 @@ close_req_tx: 1
 close_req_re_tx: 3
 close_ack_tx: 0
 close_ack_re_tx: 0
-data mean rx_rate: 5.06 Mbps - 5059288 bps
-data mean tx_rate: 5.06 Mbps - 5059288 bps
+data mean rx_rate: 3.73 Mbps - 3727702 bps
+data mean tx_rate: 3.73 Mbps - 3727702 bps

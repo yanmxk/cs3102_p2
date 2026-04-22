@@ -1,5 +1,5 @@
 Stress Test Client
-Connecting to pc8-002-l:24536
+Connecting to pc1-036-l:24536
 Number of packets: 100, Payload size: 256 bytes
 
 Connection established
@@ -37,9 +37,9 @@ Stress Test Results:
   Success rate: 100.0%
 
 RTT Statistics:
-  Min RTT: 121 us
-  Max RTT: 603 us
-  Avg RTT: 190 us (0.190 ms)
+  Min RTT: 404 us
+  Max RTT: 905 us
+  Avg RTT: 524 us (0.524 ms)
 
 RTO Statistics:
   Min RTO: 1000000 us (1000.000 ms)
@@ -49,19 +49,19 @@ RTO Statistics:
   RTO decreases: 0
 
 Adaptive RTO Performance:
-  Smoothed RTT: 180 us (0.180 ms)
-  RTT Variance: 62 us (0.062 ms)
-start_time: 2026-04-21_19:53:32 (1776797612.180300s)
-finish_time: 2026-04-21_19:53:32 (1776797612.200470s)
-(duration): 0.020170s
+  Smoothed RTT: 494 us (0.494 ms)
+  RTT Variance: 18 us (0.018 ms)
+start_time: 2026-04-22_15:00:23 (1776866423.155601s)
+finish_time: 2026-04-22_15:00:23 (1776866423.209481s)
+(duration): 0.053880s
 sd: 3
 port: 24536
-local: 0.0.0.0 37884
-remote: 138.251.29.164 24536
+local: 0.0.0.0 54387
+remote: 138.251.30.89 24536
 state: 0 (closed)
 seq_tx: 103
 seq_rx: 2
-rtt: 136 us
+rtt: 466 us
 rto: 1000000 us
 open_req_rx: 0
 open_req_dup_rx: 0
@@ -95,4 +95,4 @@ close_req_tx: 1
 close_req_re_tx: 0
 close_ack_tx: 0
 close_ack_re_tx: 0
-data mean tx_rate: 10.15 Mbps - 10153693 bps
+data mean tx_rate: 3.80 Mbps - 3801039 bps

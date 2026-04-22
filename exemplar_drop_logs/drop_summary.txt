@@ -1,24 +1,26 @@
 Drop Simulator Test Results
 ===========================
+Hostname: pc1-036-l
+Date: 2026-04-22 15:00:52
 
 This file contains the summary of drop simulator tests.
 Each test runs the drop program to simulate packet loss with various parameters.
 
 Test Summary:
 
-Start Time: 2026-04-21 15:52:41
+Start Time: 2026-04-22 15:00:52
 
-Test 1: small-5pct - PASSED (1ms, actual_drop: 1.0%)
-Test 2: medium-5pct - PASSED (1ms, actual_drop: 4.1%)
-Test 3: large-5pct - PASSED (2ms, actual_drop: 5.0%)
-Test 4: small-10pct - PASSED (1ms, actual_drop: 5.0%)
-Test 5: medium-10pct - PASSED (1ms, actual_drop: 9.5%)
-Test 6: large-10pct - PASSED (2ms, actual_drop: 10.0%)
-Test 7: small-20pct - PASSED (1ms, actual_drop: 17.0%)
-Test 8: medium-20pct - PASSED (1ms, actual_drop: 19.1%)
-Test 9: large-20pct - PASSED (2ms, actual_drop: 19.9%)
+Test 1: small-5pct - PASSED (1ms, actual_drop: 5.0%)
+Test 2: medium-5pct - PASSED (1ms, actual_drop: 4.8%)
+Test 3: large-5pct - PASSED (2ms, actual_drop: 5.2%)
+Test 4: small-10pct - PASSED (1ms, actual_drop: 7.0%)
+Test 5: medium-10pct - PASSED (1ms, actual_drop: 9.2%)
+Test 6: large-10pct - PASSED (2ms, actual_drop: 10.3%)
+Test 7: small-20pct - PASSED (1ms, actual_drop: 20.0%)
+Test 8: medium-20pct - PASSED (1ms, actual_drop: 18.8%)
+Test 9: large-20pct - PASSED (3ms, actual_drop: 20.1%)
 
-End Time: 2026-04-21 15:52:41
+End Time: 2026-04-22 15:00:52
 
 Test Summary:
   Total Tests: 9

@@ -1,6 +1,6 @@
 # Lightweight Reliable Transport Protocol (LRTP)
 
-CS3102 Practical 2: A simple, connection-oriented, unicast transport protocol built on top of UDP with reliable ordered delivery.
+CS3102 Practical 2: A simple, connection-oriented, unicast transport protocol built on top of UDP providing reliable, ordered delivery.
 
 ## Overview
 
@@ -37,12 +37,14 @@ cs3102_p2/
 
 ## Building
 
+Build the LRTP library and test binaries from the `startercode` directory.
+
 ```bash
 cd startercode
 make
 ```
 
-This compiles all test binaries and the LRTP library (`liblrtp.a`).
+This produces the test executables and `liblrtp.a` used by the tests.
 
 ### Clean Build
 
@@ -297,27 +299,60 @@ Final RTO Statistics:
   Retransmissions: 0
 ```
 
-## Test Programs
+## Test Programs (detailed)
 
-### Basic Tests (test-client/server-{0,1,2,3})
-- Simple exchange of single messages between client and server
-- Variant 0: minimal exchange
-- Variants 1-3: additional scenarios (see test source files)
+This project contains several test programs in `startercode/tests/`. Each test has a client and server companion (where applicable). Below are per-test descriptions, default parameters, usage and expected outputs.
 
-### Adaptive RTO Test (test-adaptive-rto-{client,server})
-- Demonstrates RTO adaptation with verbose statistics
-- Prints per-packet RTT, SRTT, RTTVAR, and computed RTO
-- Useful for observing how RTO responds to network conditions
+- `test-client-0` / `test-server-0`
+  - Purpose: Minimal connectivity/handshake smoke test.
+  - Usage: `./test-server-0 <port>` and `./test-client-0 <server> <port>`
+  - Behavior: Performs a minimal open/ack handshake, sends a small payload and closes. Useful for quick verification that the build and basic API calls work.
 
-### Large Transfer Test (test-large-transfer-{client,server})
-- Transfers multiple packets to test reliable ordered delivery
-- Prints running statistics of RTO evolution
+- `test-client-1` / `test-server-1`
+  - Purpose: Basic single-message exchange with slightly extended logging.
+  - Usage: `./test-server-1 <port>` and `./test-client-1 <server> <port>`
+  - Behavior: Sends a single payload, prints RTO/RTT counters and connection statistics. Good for step-through debugging of connection setup and teardown.
 
-### Multiple Sends Test (test-multiple-sends-{client,server})
-- Client and server exchange multiple messages in sequence
+- `test-client-2` / `test-server-2`
+  - Purpose: Alternate basic scenario used by the course (variant of `test-1`).
+  - Usage: analogous to test-1; see source for scenario differences.
 
-### Stress Test (test-stress-{client,server})
-- High-intensity test with many packets and retransmissions
+- `test-client-3` / `test-server-3`
+  - Purpose: Another basic scenario variant; useful to exercise additional code paths.
+  - Usage: analogous to test-1.
+
+- `test-adaptive-rto-client` / `test-adaptive-rto-server`
+  - Purpose: Demonstrate and measure adaptive RTO behavior (RFC 6298 style EWMA update).
+  - Client usage: `./test-adaptive-rto-client <server_hostname> <port> [num_packets]`
+    - Defaults: `num_packets` = 10, packet size = 1280 B
+  - Server usage: `./test-adaptive-rto-server [port]` (default port 24536)
+  - Behavior: Client sends `num_packets` of 1280 B. Both client and server print per-packet metrics: RTT, SRTT, RTTVAR and current RTO. Outputs a final RTO summary and counters (packets TX/RX, retransmissions). Ideal for plotting RTO convergence.
+
+- `test-large-transfer-client` / `test-large-transfer-server`
+  - Purpose: Evaluate RTO evolution and throughput under a sustained multi-packet transfer.
+  - Client usage: `./test-large-transfer-client <server_ip> [server_port] [payload_size]`
+    - Defaults: `server_port` = 24536, `payload_size` = 512 bytes, total packets = 20
+    - Payload size must be between 1 and 1024 bytes
+  - Server usage: `./test-large-transfer-server [port]` (default 24536)
+  - Behavior: Client sends 20 packets of `payload_size`. Both sides print per-packet RTT/RTO metrics and a final summary including total bytes and retransmissions.
+
+- `test-multiple-sends-client` / `test-multiple-sends-server`
+  - Purpose: Send a sequence of payloads with varying sizes/types to verify ordered delivery, handling of empty and binary payloads, and RTO stability.
+  - Client usage: `./test-multiple-sends-client <server_ip> [server_port]`
+    - Default port: 24536
+  - Behavior: Client transmits a set of predefined payloads (small text, medium text, larger text, binary, empty). Each send prints RTT/SRTT/RTTVAR/RTO and a label describing the payload. Server prints bytes received and RTO metrics.
+
+- `test-stress-client` / `test-stress-server`
+  - Purpose: Stress test the protocol with many rapid sends to evaluate robustness, retransmissions, and RTO behavior under load.
+  - Client usage: `./test-stress-client <server_ip> [server_port] [num_packets]`
+    - Defaults: `server_port` = 24536, `num_packets` = 50, payload size = 256 bytes (client limits up to 1000)
+  - Server usage: `./test-stress-server [port]` (default 24536)
+  - Behavior: Client sends `num_packets` quickly; both sides report periodic progress, detailed RTO statistics (min/max/avg), counts of retransmissions and success rate. Useful for measuring stability and performance under load.
+
+Notes:
+- All test servers default to port `24536` unless a port is supplied on the command line.
+- Tests print `LrtpPcb_report()` summaries at the end — these include cumulative counters (packets TX/RX, retransmits, bytes, handshake counters) which are parsed by the analysis notebook.
+- Log capture: run pairs under the `run_tests.sh`/`run_drop_tests.sh` wrappers to capture standardized logs used by `LRTP_Protocol_Analysis.ipynb` in `exemplar_logs/` and `exemplar_drop_logs/`.
 
 ## Implementation Notes
 
@@ -396,6 +431,123 @@ This implementation addresses all three formal requirements of CS3102 Practical 
 - Supports controlled loss via the provided `drop.c` utility
 - Compatible with kernel-level loss simulation using Linux `tc` (traffic control)
 - README includes instructions for both local and networked loss testing
+
+## Detailed Test Guide
+
+This section explains how to run each test, capture logs, simulate loss conditions, and generate analysis plots.
+
+- **Workspace scripts**: two convenience scripts are provided at the repository root:
+  - `run_tests.sh` — runs a selection of local test pairs and stores logs in `exemplar_logs/`.
+  - `run_drop_tests.sh` — runs tests through the `drop` utility to simulate packet loss and stores results in `exemplar_drop_logs/`.
+
+- **Log locations**:
+  - Standard test logs: `exemplar_logs/` (contains `test_summary.txt` and individual `.log` files)
+  - Drop-run logs: `exemplar_drop_logs/` (contains `drop_summary.txt` and per-test logs)
+
+- **How to run a single test pair locally**
+
+  1. Build the project if not already built:
+
+     ```bash
+     cd startercode
+     make
+     ```
+
+  2. Start the server in one terminal (example uses test-server-1):
+
+     ```bash
+     cd startercode
+     ./test-server-1 9999  # server listens on port 9999
+     ```
+
+  3. Run the matching client in another terminal:
+
+     ```bash
+     cd startercode
+     ./test-client-1 localhost 9999
+     ```
+
+  4. Check the server and client output; logs are written when the `run_tests.sh` wrapper is used.
+
+- **Run tests via repository scripts (recommended)**
+
+  - Run a quick set of tests and collect logs:
+
+    ```bash
+    ./run_tests.sh        # executes a pre-defined selection and saves logs to exemplar_logs/
+    ```
+
+  - Run loss-injection tests using the drop simulator:
+
+    ```bash
+    ./run_drop_tests.sh   # uses drop to simulate loss and saves logs to exemplar_drop_logs/
+    ```
+
+- **Makefile automation**
+
+  The `startercode/Makefile` contains targets that automate running server/client pairs. Example:
+
+  - Run an adaptive-RTO test pair locally:
+
+    ```bash
+    cd startercode
+    make run_test_adaptive
+    ```
+
+  - To run a test pair on a remote host (client on remote machine), set `MAKE_HOST` and `MAKE_SERVER` to skip prompts:
+
+    ```bash
+    cd startercode
+    make run_test_0 MAKE_HOST=user@remote.host MAKE_SERVER=192.168.1.100
+    ```
+
+- **Interpreting logs and generating plots**
+
+  - The repository includes a Jupyter notebook: `LRTP_Protocol_Analysis.ipynb` that parses `exemplar_logs/` and generates analysis plots in `plots/`.
+
+  - To run the notebook (recommended in the included virtualenv):
+
+    ```bash
+    source jupyter-env/bin/activate
+    jupyter lab LRTP_Protocol_Analysis.ipynb   # or open in Jupyter Notebook
+    ```
+
+  - The notebook reads `exemplar_logs/test_summary.txt` and each per-test `.log` file, then creates figures (`plots/fig*.png`). See the notebook cells for parsing heuristics used for RTT/SRTT/RTTVAR extraction.
+
+- **Using `drop` for simulated loss**
+
+  - Build `drop` (if not present):
+
+    ```bash
+    gcc -o drop drop.c
+    ```
+
+  - Use `drop` to simulate a percentage loss while forwarding traffic. Typical usage (10% loss over 1000 packets):
+
+    ```bash
+    ./drop 10 1000 > exemplar_drop_logs/drop_run.log
+    ```
+
+  - The `run_drop_tests.sh` script launches the server and routes the client through `drop`, capturing both sides' logs for later analysis.
+
+- **Common troubleshooting**
+
+  - "Bind failed" when starting server: ensure port is not already in use, or try another port >1024.
+  - Client cannot connect: check firewall rules, local `lo` accessibility, and whether server switched port in logs.
+  - Tests hang: enable verbose logging in `d_print.c` or run with the test pair directly in separate terminals so you can watch both sides.
+
+- **Tips for reliable testing**
+
+  - Prefer running server and client on the same machine for deterministic timing (loopback). For networked runs, use `MAKE_HOST` automation.
+  - Capture logs when using `drop` to reproduce failures deterministically.
+  - Use the notebook to produce visualizations for RTT and RTO behavior; the figures help validate adaptive RTO convergence and retransmission patterns.
+
+## Where to find results
+
+- Plots generated by the analysis notebook: `plots/` (PNG files)
+- Example logs and summaries: `exemplar_logs/test_summary.txt` and `exemplar_drop_logs/drop_summary.txt`
+
+If you want, I can also: run a specific test and produce the log + plots, or commit this updated README for you.
 
 ### Requirement 3: Adaptive RTO ✓
 

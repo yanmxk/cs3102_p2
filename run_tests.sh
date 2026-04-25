@@ -107,17 +107,37 @@ for i in "${!TEST_PAIRS[@]}"; do
     SERVER_PID=$!
     SERVER_START_TIME=$(date +%s)
     
-    # Wait for server to print that it's listening (avoid race between server start and client SSH)
+    # Determine expected listening port from client args (default 24536)
+    PORT=$(echo "$CLIENT_ARGS" | awk '{print $2}')
+    if [ -z "$PORT" ]; then
+        PORT=24536
+    fi
+
+    # Wait for the server process to be listening on the UDP port (avoid log-buffering races)
     SERVER_READY=0
     for j in {1..15}; do
-        if grep -q -e "start() OK" -e "Listening on port" -e "Listening on port" "$SERVER_LOG"; then
-            SERVER_READY=1
-            break
+        # Use ss if available, fall back to netstat
+        if command -v ss >/dev/null 2>&1; then
+            if ss -lun | grep -q ":$PORT\b"; then
+                SERVER_READY=1
+                break
+            fi
+        else
+            if netstat -anu 2>/dev/null | grep -q ":$PORT\b"; then
+                SERVER_READY=1
+                break
+            fi
         fi
         sleep 1
     done
     if [ $SERVER_READY -ne 1 ]; then
-        echo -e "${YELLOW}Warning: server did not indicate readiness after 15s; proceeding anyway${NC}"
+        # Fallback: check server log for readiness (handles platforms without ss/netstat)
+        if grep -q -e "start() OK" -e "Listening on port" "$SERVER_LOG"; then
+            SERVER_READY=1
+        fi
+    fi
+    if [ $SERVER_READY -ne 1 ]; then
+        echo -e "${YELLOW}Warning: server did not show a listening UDP port after 15s; proceeding anyway${NC}"
     fi
     
     # Run client test on remote machine

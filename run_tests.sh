@@ -8,8 +8,6 @@
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Script directory
@@ -20,10 +18,10 @@ STARTERCODE_DIR="$SCRIPT_DIR/startercode"
 LOG_DIR="$SCRIPT_DIR/test_logs_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$LOG_DIR"
 
-echo -e "${BLUE}================================================${NC}"
-echo -e "${BLUE}LRTP Test Runner${NC}"
-echo -e "${BLUE}================================================${NC}"
-echo -e "${BLUE}Server: $(hostname)${NC}"
+echo -e "================================================"
+echo -e "LRTP Test Runner"
+echo -e "================================================"
+echo -e "Server: $(hostname)"
 echo ""
 
 # Prompt for client hostname
@@ -35,7 +33,7 @@ if [ -z "$CLIENT_HOST" ]; then
 fi
 
 # Validate connection to client
-echo -e "${YELLOW}Validating connection to client at $CLIENT_HOST...${NC}"
+echo -e "Validating connection to client at $CLIENT_HOST..."
 if ! ping -c 1 -W 2 "$CLIENT_HOST" &> /dev/null; then
     echo -e "${RED}Error: Cannot reach $CLIENT_HOST${NC}"
     exit 1
@@ -82,7 +80,7 @@ echo "=====================" >> "$SUMMARY_FILE"
 echo "Start Time: $(date)" >> "$SUMMARY_FILE"
 echo "Server Host: $SERVER_HOST" >> "$SUMMARY_FILE"
 echo "Client Host: $CLIENT_HOST" >> "$SUMMARY_FILE"
-echo "Network: $SERVER_HOST ↔ $CLIENT_HOST" >> "$SUMMARY_FILE"
+echo "Network: $SERVER_HOST <-> $CLIENT_HOST" >> "$SUMMARY_FILE"
 echo "" >> "$SUMMARY_FILE"
 
 PASSED=0
@@ -94,8 +92,8 @@ for i in "${!TEST_PAIRS[@]}"; do
     IFS=':' read -r CLIENT_TEST SERVER_TEST TEST_NAME CLIENT_ARGS <<< "${TEST_PAIRS[$i]}"
     
     TEST_NUM=$((i + 1))
-    echo -e "${BLUE}[Test $TEST_NUM/$TOTAL] $TEST_NAME${NC}"
-    echo -e "${BLUE}  Network: $SERVER_HOST (server) ↔ $CLIENT_HOST (client)${NC}"
+    echo -e "[Test $TEST_NUM/$TOTAL] $TEST_NAME"
+    echo -e "  Network: $SERVER_HOST (server) <-> $CLIENT_HOST (client)"
     
     # Log files for this test
     CLIENT_LOG="$LOG_DIR/${TEST_NAME}_client.log"
@@ -183,10 +181,10 @@ for i in "${!TEST_PAIRS[@]}"; do
 done
 
 # Print and save final summary
-echo -e "${BLUE}================================================${NC}"
-echo -e "${BLUE}Test Run Complete${NC}"
-echo -e "${BLUE}================================================${NC}"
-echo -e "${BLUE}Network: $SERVER_HOST ↔ $CLIENT_HOST${NC}"
+echo -e "================================================"
+echo -e "Test Run Complete"
+echo -e "================================================"
+echo -e "Network: $SERVER_HOST <-> $CLIENT_HOST"
 echo ""
 echo -e "Total Tests: ${TOTAL}"
 echo -e "Passed: ${GREEN}${PASSED}${NC}"
@@ -204,7 +202,7 @@ echo "Failed: $FAILED" >> "$SUMMARY_FILE"
 echo "End Time: $(date)" >> "$SUMMARY_FILE"
 
 # List all log files
-echo -e "${BLUE}Generated Log Files:${NC}"
+echo -e "Generated Log Files:"
 ls -lh "$LOG_DIR"
 echo ""
 

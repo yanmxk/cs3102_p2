@@ -3,7 +3,7 @@ LRTP Test Run Summary
 Start Time: Wed 22 Apr 14:56:49 BST 2026
 Server Host: pc1-036-l
 Client Host: pc2-002-l
-Network: pc1-036-l ↔ pc2-002-l
+Network: pc1-036-l <-> pc2-002-l
 
 Test 1: 0 - PASSED (4s)
   Client Log: 0_client.log

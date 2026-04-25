@@ -152,12 +152,12 @@ void lrtp_init();  // Initialize protocol state
 - Final RTO value (converged timeout)
 
 **Throughput Analysis:**
-- Mean RX data rate (bps, Kbps, or Mbps) - `(payload_bytes_rx × 8) / duration`
-- Mean TX data rate (bps, Kbps, or Mbps) - `(payload_bytes_tx × 8) / duration`
+- Mean RX data rate (bps, Kbps, or Mbps)
+- Mean TX data rate (bps, Kbps, or Mbps)
 - Calculated from duration (finish_time - start_time)
 
 **Reliability Metrics:**
-- Total retransmissions ratio - `(data_req_re_tx / data_req_tx) × 100%`
+- Total retransmissions ratio
 - Duplicate detection rate - count of duplicates correctly identified
 - Connection success/failure indicator
 
@@ -199,8 +199,8 @@ struct {
 This section explains how to run each test, capture logs, simulate loss conditions, and generate analysis plots.
 
 - **Workspace scripts**: two convenience scripts are provided at the repository root:
-  - `run_tests.sh` — runs a selection of local test pairs and stores logs in `exemplar_logs/`.
-  - `run_drop_tests.sh` — runs tests through the `drop` utility to simulate packet loss and stores results in `exemplar_drop_logs/`.
+  - `run_tests.sh` — runs a selection of local test pairs.
+  - `run_drop_tests.sh` — runs tests through the `drop` utility to simulate packet loss.
 
 - **Log locations**:
   - Standard test logs: `exemplar_logs/` (contains `test_summary.txt` and individual `.log` files)
@@ -223,9 +223,3 @@ This section explains how to run each test, capture logs, simulate loss conditio
 - **Interpreting logs and generating plots**
 
   - The repository includes a Jupyter notebook: `LRTP_Protocol_Analysis.ipynb` that parses logs and generates analysis plots in `plots/`.
-
-## References
-
-- RFC 3782: The NewReno Modification to TCP's Fast Recovery Algorithm
-- RFC 6298: Computing TCP's Retransmission Timer
-- Course slides on transport protocols and RTO/RTT measurement

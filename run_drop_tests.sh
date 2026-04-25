@@ -13,13 +13,12 @@ LOCAL_HOST=$(hostname)
 # Color codes for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}Drop Simulator Test Suite${NC}"
-echo -e "${BLUE}========================================${NC}"
-echo -e "Host: ${BLUE}$LOCAL_HOST${NC}"
+echo -e "========================================"
+echo -e "Drop Simulator Test Suite$"
+echo -e "========================================"
+echo -e "Host: $LOCAL_HOST"
 
 # Create log directory
 mkdir -p "$DROP_TEST_DIR"
@@ -27,7 +26,7 @@ echo "Log directory: $DROP_TEST_DIR"
 
 # Compile drop if needed
 if [ ! -f "$STARTERCODE_DIR/drop" ]; then
-    echo -e "${BLUE}Compiling drop...${NC}"
+    echo -e "Compiling drop..."
     clang -o "$STARTERCODE_DIR/drop" drop.c
     if [ $? -ne 0 ]; then
         echo -e "${RED}✗ Compilation failed${NC}"
@@ -81,7 +80,7 @@ for config in "${TEST_CONFIGS[@]}"; do
     # Create test-specific log file
     LOG_FILE="$DROP_TEST_DIR/test_${TEST_NUM}_${LABEL}.log"
     
-    echo -e "${BLUE}Test $TEST_NUM: drop $DROP_PCT% with $PACKET_COUNT packets ($LABEL)${NC}"
+    echo -e "Test $TEST_NUM: drop $DROP_PCT% with $PACKET_COUNT packets ($LABEL)"
     
     # Run drop simulator
     START_TIME=$(date +%s%N)
@@ -117,9 +116,9 @@ echo "  Success Rate: $(awk "BEGIN {printf \"%.1f\", 100*$PASSED/$TEST_NUM}")%" 
 
 # Print final summary
 echo ""
-echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}Test Summary${NC}"
-echo -e "${BLUE}========================================${NC}"
+echo -e "========================================"
+echo -e "Test Summary${NC}"
+echo -e "========================================"
 echo "Total Tests: $TEST_NUM"
 echo -e "Passed: ${GREEN}$PASSED${NC}"
 echo -e "Failed: ${RED}$FAILED${NC}"

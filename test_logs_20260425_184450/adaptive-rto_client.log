@@ -1,0 +1,5 @@
+Adaptive RTO Test Client
+Connect to pc3-004-l:24536
+Sending 10 packets of 1280 bytes each
+
+lrtp_open() failed for pc3-004-l:24536

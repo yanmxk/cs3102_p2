@@ -1,0 +1,5 @@
+Stress Test Client
+Connecting to pc3-004-l:24536
+Number of packets: 100, Payload size: 256 bytes
+
+lrtp_open() failed

@@ -1,0 +1,45 @@
+LRTP Test Run Summary
+=====================
+Start Time: Sat 25 Apr 18:45:02 BST 2026
+Server Host: pc3-004-l
+Client Host: pc2-002-l
+Network: pc3-004-l ↔ pc2-002-l
+
+Test 1: 0 - PASSED (9s)
+  Client Log: 0_client.log
+  Server Log: 0_server.log
+
+Test 2: 1 - PASSED (8s)
+  Client Log: 1_client.log
+  Server Log: 1_server.log
+
+Test 3: 2 - PASSED (9s)
+  Client Log: 2_client.log
+  Server Log: 2_server.log
+
+Test 4: 3 - PASSED (8s)
+  Client Log: 3_client.log
+  Server Log: 3_server.log
+
+Test 5: adaptive-rto - FAILED (9s)
+  Client Log: adaptive-rto_client.log
+  Server Log: adaptive-rto_server.log
+
+Test 6: large-transfer - FAILED (8s)
+  Client Log: large-transfer_client.log
+  Server Log: large-transfer_server.log
+
+Test 7: multiple-sends - FAILED (9s)
+  Client Log: multiple-sends_client.log
+  Server Log: multiple-sends_server.log
+
+Test 8: stress - FAILED (8s)
+  Client Log: stress_client.log
+  Server Log: stress_server.log
+
+================================================
+Final Results
+Total Tests: 8
+Passed: 4
+Failed: 4
+End Time: Sat 25 Apr 18:46:18 BST 2026

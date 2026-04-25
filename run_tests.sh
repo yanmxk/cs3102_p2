@@ -61,7 +61,7 @@ echo ""
 # Compile all tests on CLIENT
 echo -e "${YELLOW}Compiling tests on client ($CLIENT_HOST)...${NC}"
 CLIENT_BUILD_LOG="$LOG_DIR/client_build.log"
-if ! ssh "$CLIENT_HOST" "cd $STARTERCODE_DIR && make clean > /dev/null 2>&1; make all" > "$CLIENT_BUILD_LOG" 2>&1; then
+if ! ssh "$CLIENT_HOST" "cd \"$STARTERCODE_DIR\" && make clean > /dev/null 2>&1 && make all" > "$CLIENT_BUILD_LOG" 2>&1; then
     echo -e "${RED}Build failed on client! See $CLIENT_BUILD_LOG${NC}"
     cat "$CLIENT_BUILD_LOG"
     exit 1
@@ -152,7 +152,7 @@ for i in "${!TEST_PAIRS[@]}"; do
     # Run client test on remote machine
     echo "Starting client test on $CLIENT_HOST: $CLIENT_TEST $CLIENT_ARGS"
     CLIENT_EXIT=0
-    ssh "$CLIENT_HOST" "cd $STARTERCODE_DIR && ./$CLIENT_TEST $CLIENT_ARGS" > "$CLIENT_LOG" 2>&1 || CLIENT_EXIT=$?
+    ssh "$CLIENT_HOST" "cd \"$STARTERCODE_DIR\" && ./$CLIENT_TEST $CLIENT_ARGS" > "$CLIENT_LOG" 2>&1 || CLIENT_EXIT=$?
     
     # Wait for server to finish
     SERVER_EXIT=0

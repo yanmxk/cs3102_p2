@@ -44,18 +44,29 @@ echo ""
 # Change to startercode directory
 cd "$STARTERCODE_DIR"
 
-# Compile all tests
-echo -e "${YELLOW}Compiling tests...${NC}"
+# Compile all tests on SERVER
+echo -e "${YELLOW}Compiling tests on server...${NC}"
 if ! make clean > /dev/null 2>&1; then
     echo -e "${YELLOW}(No previous build to clean)${NC}"
 fi
 
 if ! make all > "$LOG_DIR/build.log" 2>&1; then
-    echo -e "${RED}Build failed! See $LOG_DIR/build.log${NC}"
+    echo -e "${RED}Build failed on server! See $LOG_DIR/build.log${NC}"
     cat "$LOG_DIR/build.log"
     exit 1
 fi
-echo -e "${GREEN}Build successful!${NC}"
+echo -e "${GREEN}Server build successful!${NC}"
+echo ""
+
+# Compile all tests on CLIENT
+echo -e "${YELLOW}Compiling tests on client ($CLIENT_HOST)...${NC}"
+CLIENT_BUILD_LOG="$LOG_DIR/client_build.log"
+if ! ssh "$CLIENT_HOST" "cd $STARTERCODE_DIR && make clean > /dev/null 2>&1; make all" > "$CLIENT_BUILD_LOG" 2>&1; then
+    echo -e "${RED}Build failed on client! See $CLIENT_BUILD_LOG${NC}"
+    cat "$CLIENT_BUILD_LOG"
+    exit 1
+fi
+echo -e "${GREEN}Client build successful!${NC}"
 echo ""
 
 # Get server hostname (this machine)

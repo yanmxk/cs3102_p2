@@ -31,7 +31,7 @@
     network problem.
 
  */
-#define LRTP_RTO_FIXED ((uint32_t) 1000000) /* 1.0s in microseconds [us], chosen for RFC-like behaviour */ 
+#define LRTP_RTO_FIXED ((uint32_t) 500000) /* 0.5s in microseconds [us] - updated per user request */ 
 #define LRTP_MAX_RE_TX 3 /* maximum number of retransmissions, arbitrary choice */
 /* */
 

@@ -107,8 +107,18 @@ for i in "${!TEST_PAIRS[@]}"; do
     SERVER_PID=$!
     SERVER_START_TIME=$(date +%s)
     
-    # Give server time to start listening
-    sleep 3
+    # Wait for server to print that it's listening (avoid race between server start and client SSH)
+    SERVER_READY=0
+    for j in {1..15}; do
+        if grep -q -e "start() OK" -e "Listening on port" -e "Listening on port" "$SERVER_LOG"; then
+            SERVER_READY=1
+            break
+        fi
+        sleep 1
+    done
+    if [ $SERVER_READY -ne 1 ]; then
+        echo -e "${YELLOW}Warning: server did not indicate readiness after 15s; proceeding anyway${NC}"
+    fi
     
     # Run client test on remote machine
     echo "Starting client test on $CLIENT_HOST: $CLIENT_TEST $CLIENT_ARGS"

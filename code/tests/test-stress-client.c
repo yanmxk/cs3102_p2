@@ -82,7 +82,7 @@ main(int argc, char *argv[])
 
     uint32_t curr_rto = G_pcb.rto;
 
-    /* Track RTO changes */
+    // Track RTO changes 
     if (i > 0) {
       if (curr_rto > prev_rto) {
         rto_increases++;
@@ -116,7 +116,7 @@ main(int argc, char *argv[])
 
   printf("Connection closed\n\n");
 
-  /* Print comprehensive statistics */
+  // Print comprehensive statistics 
   printf("Stress Test Results:\n");
   printf("  Packets sent: %d\n", num_packets);
   printf("  Packets ACK'd: %llu\n", G_pcb.data_ack_rx);

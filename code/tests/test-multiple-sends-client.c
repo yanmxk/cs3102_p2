@@ -46,7 +46,7 @@ main(int argc, char *argv[])
 
   printf("Connection established\n\n");
 
-  /* Test payloads of varying sizes */
+  // Test payloads of varying sizes
   struct {
     const char *data;
     int size;

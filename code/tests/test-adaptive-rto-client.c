@@ -57,7 +57,7 @@ main(int argc, char *argv[])
   printf("Connection established (adaptive RTO initialized)\n");
   printf("Initial RTO: %u us (%.3f s)\n\n", G_pcb.rto, (double)G_pcb.rto / 1000000.0);
 
-  /* Send packets and observe RTO adaptation */
+  // Send packets and observe RTO adaptation
   uint8_t *data = (uint8_t *)malloc(PACKET_SIZE);
   if (data == NULL) {
     fprintf(stderr, "Memory allocation failed\n");
@@ -77,7 +77,7 @@ main(int argc, char *argv[])
       break;
     }
 
-    /* Display RTO metrics after each successful transmission */
+    // Display RTO metrics after each successful transmission
     printf("%7d | %12u | %12u | %12u | %12u | %.6f\n",
            i + 1,
            G_pcb.rtt,
@@ -91,7 +91,7 @@ main(int argc, char *argv[])
   printf("Closing connection...\n");
   lrtp_close(sd);
 
-  /* Print final statistics */
+  // Print final statistics
   printf("\nFinal RTO Statistics:\n");
   printf("  Smoothed RTT: %u us (%.3f ms)\n", G_pcb.srtt, (double)G_pcb.srtt / 1000.0);
   printf("  RTT Variance: %u us (%.3f ms)\n", G_pcb.rttvar, (double)G_pcb.rttvar / 1000.0);

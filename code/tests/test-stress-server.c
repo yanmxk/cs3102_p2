@@ -77,7 +77,7 @@ main(int argc, char *argv[])
       if (G_pcb.rtt > max_rtt) max_rtt = G_pcb.rtt;
     }
 
-    /* Print progress every 10 packets */
+    // Print progress every 10 packets
     if (packet_count % 10 == 0) {
       printf("  Received %d packets (%d bytes), RTO: %u us\n", 
              packet_count, total_bytes, G_pcb.rto);

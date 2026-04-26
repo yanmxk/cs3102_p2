@@ -64,7 +64,7 @@ main(int argc, char *argv[])
     return 1;
   }
 
-  /* Fill payload with pattern data */
+  // Fill payload with pattern data
   for (int i = 0; i < payload_size; i++) {
     payload[i] = (uint8_t)((i + 'A') % 256);
   }
@@ -97,7 +97,7 @@ main(int argc, char *argv[])
 
   printf("Connection closed\n\n");
 
-  /* Print final RTO statistics */
+  // Print final RTO statistics
   printf("Final RTO Statistics:\n");
   printf("  Smoothed RTT: %u us (%.3f ms)\n", G_pcb.srtt, (double)G_pcb.srtt / 1000.0);
   printf("  RTT Variance: %u us (%.3f ms)\n", G_pcb.rttvar, (double)G_pcb.rttvar / 1000.0);

@@ -23,7 +23,7 @@ extern Lrtp_Pcb_t G_pcb;
 int
 main(int argc, char *argv[])
 {
-  uint16_t port = 24536; /* Default port */
+  uint16_t port = 24536; // Default port 
 
   if (argc > 1) {
     port = (uint16_t)atoi(argv[1]);
@@ -64,7 +64,7 @@ main(int argc, char *argv[])
   while (1) {
     int n = lrtp_rx(acc_sd, buffer, BUFFER_SIZE);
     if (n < 0) {
-      /* Connection closed or error */
+      // Connection closed or error
       break;
     }
 
@@ -81,7 +81,7 @@ main(int argc, char *argv[])
   printf("\n");
   printf("Connection closed\n");
 
-  /* Print final RTO statistics */
+  // Print final RTO statistics
   printf("\nFinal RTO Statistics (Server View):\n");
   printf("  Smoothed RTT: %u us (%.3f ms)\n", G_pcb.srtt, (double)G_pcb.srtt / 1000.0);
   printf("  RTT Variance: %u us (%.3f ms)\n", G_pcb.rttvar, (double)G_pcb.rttvar / 1000.0);

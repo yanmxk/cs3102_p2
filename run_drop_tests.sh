@@ -6,7 +6,7 @@
 
 set -o pipefail
 
-STARTERCODE_DIR="./startercode"
+STARTERCODE_DIR="./code"
 DROP_TEST_DIR="drop_logs_$(date +%Y%m%d_%H%M%S)"
 LOCAL_HOST=$(hostname)
 

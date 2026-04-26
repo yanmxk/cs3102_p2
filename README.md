@@ -16,7 +16,7 @@ LRTP implements a lightweight, blocking/synchronous transport protocol that prov
 cs3102_p2/
 ├── README.md                        # This file
 ├── drop.c                           # Packet drop simulator utility
-├── startercode/
+├── code/
 │   ├── Makefile                     # Build and test automation
 │   ├── lrtp.h                       # LRTP API (public interface)
 │   ├── lrtp.c                       # Core protocol implementation
@@ -37,10 +37,10 @@ cs3102_p2/
 
 ## Building
 
-Build the LRTP library and test binaries from the `startercode` directory.
+Build the LRTP library and test binaries from the `code` directory.
 
 ```bash
-cd startercode
+cd code
 make
 ```
 
@@ -59,13 +59,13 @@ make
 
 Start a server in one terminal:
 ```bash
-cd startercode
+cd code
 ./test-server-0 9999
 ```
 
 In another terminal, run a client:
 ```bash
-cd startercode
+cd code
 ./test-client-0 localhost 9999
 ```
 
@@ -97,7 +97,7 @@ make run_test_0 MAKE_HOST=user@remote.example.com MAKE_SERVER=192.168.1.100
 
 To run a client on a remote machine:
 
-1. Ensure the remote machine has the project at `~/cs3102_p2/startercode`.
+1. Ensure the remote machine has the project at `~/cs3102_p2/code`.
 2. Run with `MAKE_HOST`:
    ```bash
    make run_test_0 MAKE_HOST=user@remote.host
@@ -301,7 +301,7 @@ Final RTO Statistics:
 
 ## Test Programs (detailed)
 
-This project contains several test programs in `startercode/tests/`. Each test has a client and server companion (where applicable). Below are per-test descriptions, default parameters, usage and expected outputs.
+This project contains several test programs in `code/tests/`. Each test has a client and server companion (where applicable). Below are per-test descriptions, default parameters, usage and expected outputs.
 
 - `test-client-0` / `test-server-0`
   - Purpose: Minimal connectivity/handshake smoke test.
@@ -449,21 +449,21 @@ This section explains how to run each test, capture logs, simulate loss conditio
   1. Build the project if not already built:
 
      ```bash
-     cd startercode
+     cd code
      make
      ```
 
   2. Start the server in one terminal (example uses test-server-1):
 
      ```bash
-     cd startercode
+     cd code
      ./test-server-1 9999  # server listens on port 9999
      ```
 
   3. Run the matching client in another terminal:
 
      ```bash
-     cd startercode
+     cd code
      ./test-client-1 localhost 9999
      ```
 
@@ -485,19 +485,19 @@ This section explains how to run each test, capture logs, simulate loss conditio
 
 - **Makefile automation**
 
-  The `startercode/Makefile` contains targets that automate running server/client pairs. Example:
+  The `code/Makefile` contains targets that automate running server/client pairs. Example:
 
   - Run an adaptive-RTO test pair locally:
 
     ```bash
-    cd startercode
+    cd code
     make run_test_adaptive
     ```
 
   - To run a test pair on a remote host (client on remote machine), set `MAKE_HOST` and `MAKE_SERVER` to skip prompts:
 
     ```bash
-    cd startercode
+    cd code
     make run_test_0 MAKE_HOST=user@remote.host MAKE_SERVER=192.168.1.100
     ```
 
@@ -597,7 +597,7 @@ If you want, I can also: run a specific test and produce the log + plots, or com
 
 ### Remote SSH connection issues
 - Ensure SSH access to the remote host is configured
-- Check that `~/cs3102_p2/startercode` exists on the remote host with built binaries
+- Check that `~/cs3102_p2/code` exists on the remote host with built binaries
 - Use `MAKE_HOST=user@host` to specify remote user explicitly
 
 ### Packet loss simulation

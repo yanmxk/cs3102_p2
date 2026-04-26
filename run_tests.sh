@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 
 # Script directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-STARTERCODE_DIR="$SCRIPT_DIR/startercode"
+STARTERCODE_DIR="$SCRIPT_DIR/code"
 
 # Create timestamped log directory
 LOG_DIR="$SCRIPT_DIR/test_logs_$(date +%Y%m%d_%H%M%S)"
@@ -41,13 +41,13 @@ fi
 echo -e "${GREEN}✓ Connection validated${NC}"
 echo ""
 
-# Change to startercode directory
+# Change to code directory
 cd "$STARTERCODE_DIR"
 
 # Compile all tests on SERVER
-echo -e "${YELLOW}Compiling tests on server...${NC}"
+echo -e "Compiling tests on server..."
 if ! make clean > /dev/null 2>&1; then
-    echo -e "${YELLOW}(No previous build to clean)${NC}"
+    echo -e "(No previous build to clean)"
 fi
 
 if ! make all > "$LOG_DIR/build.log" 2>&1; then
@@ -59,7 +59,7 @@ echo -e "${GREEN}Server build successful!${NC}"
 echo ""
 
 # Compile all tests on CLIENT
-echo -e "${YELLOW}Compiling tests on client ($CLIENT_HOST)...${NC}"
+echo -e "Compiling tests on client ($CLIENT_HOST)..."
 CLIENT_BUILD_LOG="$LOG_DIR/client_build.log"
 if ! ssh "$CLIENT_HOST" "cd \"$STARTERCODE_DIR\" && make clean > /dev/null 2>&1 && make all" > "$CLIENT_BUILD_LOG" 2>&1; then
     echo -e "${RED}Build failed on client! See $CLIENT_BUILD_LOG${NC}"
@@ -122,7 +122,7 @@ for i in "${!TEST_PAIRS[@]}"; do
         PORT=24536
     fi
 
-    # Wait for the server process to be listening on the UDP port (avoid log-buffering races)
+    # Wait for the server process to be listening on the UDP port
     SERVER_READY=0
     for j in {1..15}; do
         # Use ss if available, fall back to netstat
@@ -146,7 +146,7 @@ for i in "${!TEST_PAIRS[@]}"; do
         fi
     fi
     if [ $SERVER_READY -ne 1 ]; then
-        echo -e "${YELLOW}Warning: server did not show a listening UDP port after 15s; proceeding anyway${NC}"
+        echo -e "Warning: server did not show a listening UDP port after 15s; proceeding anyway"
     fi
     
     # Run client test on remote machine
@@ -201,7 +201,7 @@ echo -e "Total Tests: ${TOTAL}"
 echo -e "Passed: ${GREEN}${PASSED}${NC}"
 echo -e "Failed: ${RED}${FAILED}${NC}"
 echo ""
-echo -e "Log directory: ${YELLOW}$LOG_DIR${NC}"
+echo -e "Log directory: $LOG_DIR"
 echo ""
 
 # Append final stats to summary

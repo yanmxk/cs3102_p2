@@ -37,10 +37,10 @@ cs3102_p2/
 
 ## Building
 
-Build the LRTP library and test binaries from the `code` directory.
+Build the LRTP library and test binaries from the `startercode` directory.
 
 ```bash
-cd code
+cd startercode
 make
 ```
 
@@ -59,54 +59,15 @@ make
 
 Start a server in one terminal:
 ```bash
-cd code
+cd startercode
 ./test-server-0 9999
 ```
 
 In another terminal, run a client:
 ```bash
-cd code
+cd startercode
 ./test-client-0 localhost 9999
 ```
-
-### Automated Test Targets
-
-The Makefile provides convenient targets to run server/client pairs automatically:
-
-```bash
-make run_test_0       # Run test-0 pair (handles prompts internally)
-make run_test_1       # Run test-1 pair
-make run_test_2       # Run test-2 pair
-make run_test_3       # Run test-3 pair
-make run_test_adaptive # Run adaptive RTO test pair
-make run_all_tests    # Run all test pairs in sequence
-```
-
-Each `run_test_*` target will:
-1. Prompt for the remote client host (if needed for cross-host testing)
-2. Prompt for the server address (reachable from the remote client)
-3. Start a server locally
-4. Launch the client (locally or remotely via SSH)
-
-**Environment overrides:** To skip prompts, set `MAKE_HOST` and `MAKE_SERVER`:
-```bash
-make run_test_0 MAKE_HOST=user@remote.example.com MAKE_SERVER=192.168.1.100
-```
-
-### Cross-Host Testing
-
-To run a client on a remote machine:
-
-1. Ensure the remote machine has the project at `~/cs3102_p2/code`.
-2. Run with `MAKE_HOST`:
-   ```bash
-   make run_test_0 MAKE_HOST=user@remote.host
-   ```
-3. When prompted for server address, enter the IP/hostname reachable from the remote host.
-
-The Makefile will SSH into the remote host, change to the project directory, and execute the client binary there.
-
-**Passwordless SSH recommended:** For seamless execution, set up SSH keys on the remote host to avoid password prompts during the test.
 
 ## Testing with Controlled Loss
 
@@ -124,31 +85,25 @@ Use the provided `drop.c` utility to simulate packet loss:
 
    This will display each packet and indicate which ones are "dropped".
 
-3. **For real network loss emulation** (at the kernel level), use `tc` (traffic control) on Linux:
-   ```bash
-   sudo tc qdisc add dev lo root netem loss 10%  # 10% loss on loopback
-   sudo tc qdisc del dev lo root                 # Remove the constraint
-   ```
-
 ## API Overview
 
 All functions are defined in `lrtp.h`. The server and client APIs are asymmetric:
 
 ### Server-side
 ```c
-int lrtp_start(uint16_t port);      // Listen on a port
-int lrtp_accept(int sd);            // Accept an incoming connection
-int lrtp_rx(int sd, void *data, uint16_t data_size);      // Receive data
-int lrtp_tx(int sd, void *data, uint16_t data_size);      // Send data
-int lrtp_close(int sd);             // Close connection
+int lrtp_start(uint16_t port);                       // Listen on a port
+int lrtp_accept(int sd);                             // Accept an incoming connection
+int lrtp_rx(int sd, void *data, uint16_t data_size); // Receive data
+int lrtp_tx(int sd, void *data, uint16_t data_size); // Send data
+int lrtp_close(int sd);                              // Close connection
 ```
 
 ### Client-side
 ```c
-int lrtp_open(const char *fqdn, uint16_t port);  // Connect to server
-int lrtp_tx(int sd, void *data, uint16_t data_size);      // Send data
-int lrtp_rx(int sd, void *data, uint16_t data_size);      // Receive data
-int lrtp_close(int sd);             // Close connection
+int lrtp_open(const char *fqdn, uint16_t port);       // Connect to server
+int lrtp_tx(int sd, void *data, uint16_t data_size);  // Send data
+int lrtp_rx(int sd, void *data, uint16_t data_size);  // Receive data
+int lrtp_close(int sd);                               // Close connection
 ```
 
 ### Initialization
@@ -175,86 +130,12 @@ void lrtp_init();  // Initialize protocol state
 2. **close_ack:** Responder acknowledges; connection closed
 
 ### Retransmission (Idle-RQ with N=1)
-
-- If an acknowledgment is not received within the RTO period, the sender retransmits the unacknowledged packet
-- Retransmissions continue up to `LRTP_MAX_RE_TX` (3 by default) before the connection is considered failed
 - **Fixed RTO:** Initially 0.5 second (before first RTT sample)
 - **Adaptive RTO:** After first RTT measurement, RTO is computed using EWMA (exponential weighted moving average):
   - SRTT (Smoothed RTT) = 7/8 × SRTT + 1/8 × RTT
   - RTTVAR (RTT Variance) = 3/4 × RTTVAR + 1/4 × |SRTT - RTT|
   - RTO = SRTT + 4 × RTTVAR
   - Clamped to [0.5s, 60s] per RFC 6298
-
-## Adaptive RTO
-
-The adaptive RTO implementation (`lrtp_calculate_adaptive_rto()` in `lrtp-fsm.c`) adjusts the retransmission timeout based on observed round-trip times:
-
-### Benefits
-- Faster recovery on low-latency networks (RTO decreases after smooth RTTs)
-- More patient waiting on high-latency networks (RTO increases after high RTTs)
-- Better overall throughput and responsiveness
-
-### Testing Adaptive RTO
-```bash
-make run_test_adaptive
-```
-
-This runs a dedicated test that displays RTT statistics and RTO values as packets are transmitted.
-
-## Metrics Collected
-
-The LRTP implementation captures comprehensive metrics for performance analysis and validation:
-
-### Per-Packet Metrics (Real-time Display)
-
-Each data transfer displays per-packet values:
-- **RTT (Round Trip Time)** [microseconds] - measured time from packet transmission to acknowledgment receipt
-- **SRTT (Smoothed RTT)** [microseconds] - exponential moving average of observed RTTs (α = 1/8)
-- **RTTVAR (RTT Variance)** [microseconds] - variability estimation in RTT measurements (β = 1/4)
-- **RTO (Retransmission Timeout)** [microseconds & seconds] - computed timeout = SRTT + 4×RTTVAR
-- **Packet sequence number** - for tracking order and identifying losses
-
-Example from adaptive RTO test output:
-```
-Packet |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   |  RTO (s)
---------|--------------|--------------|--------------|--------------|----------
-      1 |      12345   |      12345   |       6172   |      36689   | 0.036689
-      2 |      12421   |      12357   |       6177   |      36765   | 0.036765
-```
-
-### Connection-Level Statistics
-
-Comprehensive counters maintained in the Protocol Control Block (`G_pcb`):
-
-**Handshake Counters:**
-- `open_req_tx` - OPEN_REQ packets sent (initial)
-- `open_req_re_tx` - OPEN_REQ retransmissions
-- `open_req_rx` - OPEN_REQ packets received (server-side)
-- `open_req_dup_rx` - duplicate OPEN_REQ detected
-- `open_reqack_tx`, `open_reqack_re_tx`, `open_reqack_rx`, `open_reqack_dup_rx`
-- `open_ack_tx`, `open_ack_re_tx`, `open_ack_rx`, `open_ack_dup_rx`
-
-**Data Transfer Counters:**
-- `data_req_tx` - DATA packets sent (initial transmissions)
-- `data_req_re_tx` - DATA packets retransmitted
-- `data_req_bytes_tx` - total payload bytes sent (excluding retransmissions)
-- `data_req_bytes_re_tx` - payload bytes in retransmitted packets
-- `data_req_rx` - DATA packets received (initial only)
-- `data_req_dup_rx` - duplicate DATA packets received
-- `data_req_bytes_rx` - payload bytes received (initial only)
-- `data_req_bytes_dup_rx` - duplicate payload bytes detected
-- `data_ack_rx` - DATA_ACK packets received
-- `data_ack_dup_rx` - duplicate DATA_ACK packets
-- `data_ack_tx`, `data_ack_re_tx` - DATA_ACK transmission stats
-
-**Close Protocol Counters:**
-- `close_req_tx`, `close_req_re_tx`, `close_req_rx`, `close_req_dup_rx`
-- `close_ack_tx`, `close_ack_re_tx`, `close_ack_rx`, `close_ack_dup_rx`
-
-**Timing Metrics:**
-- `start_time` [microseconds] - connection establishment timestamp
-- `finish_time` [microseconds] - connection closure timestamp
-- Duration (calculated) - total connection lifetime
 
 ### Summary Statistics
 
@@ -272,87 +153,6 @@ Comprehensive counters maintained in the Protocol Control Block (`G_pcb`):
 - Total retransmissions ratio
 - Duplicate detection rate - count of duplicates correctly identified
 - Connection success/failure indicator
-
-### Example Test Output
-
-From `test-adaptive-rto-client`:
-```
-Adaptive RTO Test Client
-Connect to localhost:24536
-Sending 10 packets of 1280 bytes each
-
-Connection established (adaptive RTO initialized)
-Initial RTO: 1000000 us (1.000 s)
-
-Packet |   RTT (us)   |  SRTT (us)   | RTTVAR (us)  |   RTO (us)   |  RTO (s)
---------|--------------|--------------|--------------|--------------|----------
-      1 |       5234   |       5234   |       2617   |      15702   | 0.015702
-      2 |       5187   |       5220   |       2609   |      15658   | 0.015658
-   ...
-
-Final RTO Statistics:
-  Smoothed RTT: 5215 us (5.215 ms)
-  RTT Variance: 2608 us (2.608 ms)
-  Final RTO: 15647 us (0.015647 s)
-  Data packets TX: 10
-  Data packets RX (ACK): 10
-  Retransmissions: 0
-```
-
-## Test Programs (detailed)
-
-This project contains several test programs in `code/tests/`. Each test has a client and server companion (where applicable). Below are per-test descriptions, default parameters, usage and expected outputs.
-
-- `test-client-0` / `test-server-0`
-  - Purpose: Minimal connectivity/handshake smoke test.
-  - Usage: `./test-server-0 <port>` and `./test-client-0 <server> <port>`
-  - Behavior: Performs a minimal open/ack handshake, sends a small payload and closes. Useful for quick verification that the build and basic API calls work.
-
-- `test-client-1` / `test-server-1`
-  - Purpose: Basic single-message exchange with slightly extended logging.
-  - Usage: `./test-server-1 <port>` and `./test-client-1 <server> <port>`
-  - Behavior: Sends a single payload, prints RTO/RTT counters and connection statistics. Good for step-through debugging of connection setup and teardown.
-
-- `test-client-2` / `test-server-2`
-  - Purpose: Alternate basic scenario used by the course (variant of `test-1`).
-  - Usage: analogous to test-1; see source for scenario differences.
-
-- `test-client-3` / `test-server-3`
-  - Purpose: Another basic scenario variant; useful to exercise additional code paths.
-  - Usage: analogous to test-1.
-
-- `test-adaptive-rto-client` / `test-adaptive-rto-server`
-  - Purpose: Demonstrate and measure adaptive RTO behavior (RFC 6298 style EWMA update).
-  - Client usage: `./test-adaptive-rto-client <server_hostname> <port> [num_packets]`
-    - Defaults: `num_packets` = 10, packet size = 1280 B
-  - Server usage: `./test-adaptive-rto-server [port]` (default port 24536)
-  - Behavior: Client sends `num_packets` of 1280 B. Both client and server print per-packet metrics: RTT, SRTT, RTTVAR and current RTO. Outputs a final RTO summary and counters (packets TX/RX, retransmissions). Ideal for plotting RTO convergence.
-
-- `test-large-transfer-client` / `test-large-transfer-server`
-  - Purpose: Evaluate RTO evolution and throughput under a sustained multi-packet transfer.
-  - Client usage: `./test-large-transfer-client <server_ip> [server_port] [payload_size]`
-    - Defaults: `server_port` = 24536, `payload_size` = 512 bytes, total packets = 20
-    - Payload size must be between 1 and 1024 bytes
-  - Server usage: `./test-large-transfer-server [port]` (default 24536)
-  - Behavior: Client sends 20 packets of `payload_size`. Both sides print per-packet RTT/RTO metrics and a final summary including total bytes and retransmissions.
-
-- `test-multiple-sends-client` / `test-multiple-sends-server`
-  - Purpose: Send a sequence of payloads with varying sizes/types to verify ordered delivery, handling of empty and binary payloads, and RTO stability.
-  - Client usage: `./test-multiple-sends-client <server_ip> [server_port]`
-    - Default port: 24536
-  - Behavior: Client transmits a set of predefined payloads (small text, medium text, larger text, binary, empty). Each send prints RTT/SRTT/RTTVAR/RTO and a label describing the payload. Server prints bytes received and RTO metrics.
-
-- `test-stress-client` / `test-stress-server`
-  - Purpose: Stress test the protocol with many rapid sends to evaluate robustness, retransmissions, and RTO behavior under load.
-  - Client usage: `./test-stress-client <server_ip> [server_port] [num_packets]`
-    - Defaults: `server_port` = 24536, `num_packets` = 50, payload size = 256 bytes (client limits up to 1000)
-  - Server usage: `./test-stress-server [port]` (default 24536)
-  - Behavior: Client sends `num_packets` quickly; both sides report periodic progress, detailed RTO statistics (min/max/avg), counts of retransmissions and success rate. Useful for measuring stability and performance under load.
-
-Notes:
-- All test servers default to port `24536` unless a port is supplied on the command line.
-- Tests print `LrtpPcb_report()` summaries at the end — these include cumulative counters (packets TX/RX, retransmits, bytes, handshake counters) which are parsed by the analysis notebook.
-- Log capture: run pairs under the `run_tests.sh`/`run_drop_tests.sh` wrappers to capture standardized logs used by `LRTP_Protocol_Analysis.ipynb` in `exemplar_logs/` and `exemplar_drop_logs/`.
 
 ## Implementation Notes
 
@@ -387,52 +187,7 @@ struct {
 } Lrtp_Packet_t;
 ```
 
-## Success Criteria & Requirements Coverage
-
-This implementation addresses all three formal requirements of CS3102 Practical 2:
-
-### Requirement 1: Protocol Design ✓
-
-**Finite State Machine (FSM)**
-- Implemented in `lrtp-fsm.h` and `lrtp-fsm.c`
-- States: CLOSED, LISTENING, OPENING_I, OPENING_R, CONNECTED, CLOSING_I
-- State transitions are managed by the core protocol implementation in `lrtp.c`
-- FSM handles connection lifecycle and responds to timeouts via adaptive RTO
-
-**Protocol Design**
-- Binary packet format defined in `lrtp-packet.h`
-- Three-way handshake for connection establishment (open_req → open_reqack → open_ack)
-- Data transfer using sequence numbers and acknowledgments (data_req / data_ack)
-- Graceful connection termination (close_req / close_ack)
-- All packet types follow a consistent header structure with type, sequence, and data size fields
-
-### Requirement 2: Protocol Implementation ✓
-
-**API Compliance**
-- Fully implements the blocking/synchronous LRTP API defined in `lrtp.h`
-- All required functions: `lrtp_init()`, `lrtp_start()`, `lrtp_accept()`, `lrtp_open()`, `lrtp_tx()`, `lrtp_rx()`, `lrtp_close()`
-
-**Test Evidence**
-- Provides 8 test programs demonstrating protocol operation:
-  - **test-client/server-{0,1,2,3}**: Basic functionality tests
-  - **test-adaptive-rto-{client,server}**: RTO measurement and adaptation
-  - **test-large-transfer-{client,server}**: Multi-packet transfers
-  - **test-stress-{client,server}**: High-intensity retransmission scenarios
-- Makefile targets (`make run_test_*`) automate local and cross-host testing
-- All tests demonstrate reliable ordered delivery, connection establishment, and termination
-
-**Reliable Data Transfer**
-- Implements idle-RQ (go-back-N with N=1) retransmission mechanism
-- Initial fixed RTO of **1.0 second** per RFC 6298 (updated from 500ms for RFC compliance)
-- Retransmissions up to `LRTP_MAX_RE_TX` (3 by default) before connection failure
-- Sequence numbers ensure ordered delivery
-
-**Testing with Loss**
-- Supports controlled loss via the provided `drop.c` utility
-- Compatible with kernel-level loss simulation using Linux `tc` (traffic control)
-- README includes instructions for both local and networked loss testing
-
-## Detailed Test Guide
+## Test Guide
 
 This section explains how to run each test, capture logs, simulate loss conditions, and generate analysis plots.
 
@@ -444,32 +199,8 @@ This section explains how to run each test, capture logs, simulate loss conditio
   - Standard test logs: `exemplar_logs/` (contains `test_summary.txt` and individual `.log` files)
   - Drop-run logs: `exemplar_drop_logs/` (contains `drop_summary.txt` and per-test logs)
 
-- **How to run a single test pair locally**
-
-  1. Build the project if not already built:
-
-     ```bash
-     cd code
-     make
-     ```
-
-  2. Start the server in one terminal (example uses test-server-1):
-
-     ```bash
-     cd code
-     ./test-server-1 9999  # server listens on port 9999
-     ```
-
-  3. Run the matching client in another terminal:
-
-     ```bash
-     cd code
-     ./test-client-1 localhost 9999
-     ```
-
-  4. Check the server and client output; logs are written when the `run_tests.sh` wrapper is used.
-
-- **Run tests via repository scripts (recommended)**
+- **Run tests via repository scripts (recommended)**    
+**Note:** The folder with submission must in in the same location on both machines with identical content.
 
   - Run a quick set of tests and collect logs:
 
@@ -483,138 +214,6 @@ This section explains how to run each test, capture logs, simulate loss conditio
     ./run_drop_tests.sh   # uses drop to simulate loss and saves logs to exemplar_drop_logs/
     ```
 
-- **Makefile automation**
-
-  The `code/Makefile` contains targets that automate running server/client pairs. Example:
-
-  - Run an adaptive-RTO test pair locally:
-
-    ```bash
-    cd code
-    make run_test_adaptive
-    ```
-
-  - To run a test pair on a remote host (client on remote machine), set `MAKE_HOST` and `MAKE_SERVER` to skip prompts:
-
-    ```bash
-    cd code
-    make run_test_0 MAKE_HOST=user@remote.host MAKE_SERVER=192.168.1.100
-    ```
-
 - **Interpreting logs and generating plots**
 
-<<<<<<< HEAD
   - The repository includes a Jupyter notebook: `LRTP_Protocol_Analysis.ipynb` that parses logs and generates analysis plots in `plots/`.
-=======
-  - The repository includes a Jupyter notebook: `LRTP_Protocol_Analysis.ipynb` that parses `exemplar_logs/` and generates analysis plots in `plots/`.
-
-  - To run the notebook (recommended in the included virtualenv):
-
-    ```bash
-    source jupyter-env/bin/activate
-    jupyter lab LRTP_Protocol_Analysis.ipynb   # or open in Jupyter Notebook
-    ```
-
-  - The notebook reads `exemplar_logs/test_summary.txt` and each per-test `.log` file, then creates figures (`plots/fig*.png`). See the notebook cells for parsing heuristics used for RTT/SRTT/RTTVAR extraction.
-
-- **Using `drop` for simulated loss**
-
-  - Build `drop` (if not present):
-
-    ```bash
-    gcc -o drop drop.c
-    ```
-
-  - Use `drop` to simulate a percentage loss while forwarding traffic. Typical usage (10% loss over 1000 packets):
-
-    ```bash
-    ./drop 10 1000 > exemplar_drop_logs/drop_run.log
-    ```
-
-  - The `run_drop_tests.sh` script launches the server and routes the client through `drop`, capturing both sides' logs for later analysis.
-
-- **Common troubleshooting**
-
-  - "Bind failed" when starting server: ensure port is not already in use, or try another port >1024.
-  - Client cannot connect: check firewall rules, local `lo` accessibility, and whether server switched port in logs.
-  - Tests hang: enable verbose logging in `d_print.c` or run with the test pair directly in separate terminals so you can watch both sides.
-
-- **Tips for reliable testing**
-
-  - Prefer running server and client on the same machine for deterministic timing (loopback). For networked runs, use `MAKE_HOST` automation.
-  - Capture logs when using `drop` to reproduce failures deterministically.
-  - Use the notebook to produce visualizations for RTT and RTO behavior; the figures help validate adaptive RTO convergence and retransmission patterns.
-
-## Where to find results
-
-- Plots generated by the analysis notebook: `plots/` (PNG files)
-- Example logs and summaries: `exemplar_logs/test_summary.txt` and `exemplar_drop_logs/drop_summary.txt`
-
-If you want, I can also: run a specific test and produce the log + plots, or commit this updated README for you.
-
-### Requirement 3: Adaptive RTO ✓
-
-**Adaptive RTO Implementation**
-- `lrtp_calculate_adaptive_rto()` in `lrtp-fsm.c` implements RFC 6298 compliant RTO calculation
-- Uses EWMA (exponential weighted moving average) for smooth RTT estimation:
-  - SRTT coefficient: α = 1/8
-  - RTTVAR coefficient: β = 1/4
-  - RTO multiplier: K = 4
-- Clamped to RFC 6298 bounds: [1 second, 60 seconds]
-- RTT measurements taken during connection establishment (3-way handshake) and data transfer
-
-**Adaptive RTO Testing**
-- Dedicated test program: `test-adaptive-rto-{client,server}`
-- Per-packet statistics display: RTT, SRTT, RTTVAR, computed RTO
-- Demonstrates RTO adaptation in response to network conditions
-- Runnable with: `make run_test_adaptive`
-
-**Performance Comparison**
-- Large transfer test shows RTO evolution over multiple packets
-- Adaptive RTO converges to stable values on consistent-latency networks
-- Behaves gracefully under variable latency conditions
-- Works correctly with and without packet loss
-
-### Additional Requirements ✓
-
-**Language & Implementation**
-- Pure C implementation adhering to POSIX standards
-- Binary protocol (no text encoding or assumptions about data type)
-- No hard-coded IP addresses; all hostnames/addresses provided via CLI or prompts
-
-**Cross-Host Testing Support**
-- Makefile provides SSH-based remote client execution
-- Environment variables allow transparent cross-machine setup: `MAKE_HOST` and `MAKE_SERVER`
-- Tests can run on CS Linux lab machines or any SSH-accessible hosts
-- Helper script: `scripts/run_client.sh` assists remote execution
-
-## Troubleshooting
-
-### Connection timeouts
-- Check that the server is running and listening on the specified port
-- Verify firewall settings if testing across different machines
-- Increase RTO if network latency is high (see `lrtp.h` constants)
-
-### Remote SSH connection issues
-- Ensure SSH access to the remote host is configured
-- Check that `~/cs3102_p2/code` exists on the remote host with built binaries
-- Use `MAKE_HOST=user@host` to specify remote user explicitly
-
-### Packet loss simulation
-- Use the `drop` utility for local testing
-- Use `tc` (traffic control) for kernel-level loss on real network interfaces
-- Remember to clean up `tc` rules after testing: `sudo tc qdisc del dev <iface> root`
-
-## References
-
-- RFC 3782: The NewReno Modification to TCP's Fast Recovery Algorithm
-- RFC 6298: Computing TCP's Retransmission Timer
-- Course slides on transport protocols and RTO/RTT measurement
-
-## Author & Version
-
-CS3102 Practical 2 Implementation
-- Started: January 2024
-- Last checked: March 2026
-- Implementation date: April 2026
->>>>>>> parent of e21445f (clean uping)
